@@ -1,0 +1,1715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BuzzShield — Agentic Smart Contract Security</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #060A0F;
+  --bg2: #0C1219;
+  --bg3: #111820;
+  --cyan: #00F5D4;
+  --cyan2: #00C4AA;
+  --amber: #F59E0B;
+  --red: #EF4444;
+  --green: #10B981;
+  --purple: #8B5CF6;
+  --blue: #3B82F6;
+  --text: #E8EDF2;
+  --muted: #5A6678;
+  --border: rgba(0,245,212,0.12);
+  --border2: rgba(255,255,255,0.06);
+  --font-display: 'Syne', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-mono);
+  overflow-x: hidden;
+  cursor: default;
+}
+
+/* ── NOISE TEXTURE OVERLAY ── */
+body::before {
+  content:'';
+  position:fixed; inset:0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events:none; z-index:0; opacity:0.4;
+}
+
+/* ── SPA ROUTING ── */
+.page-container {
+  display: none;
+  animation: pageFadeIn 0.5s ease forwards;
+}
+.page-container.active {
+  display: block;
+}
+@keyframes pageFadeIn {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.nav-logo { transition: opacity 0.2s; }
+.nav-logo:hover { opacity: 0.8; }
+.nav-links a.active {
+  color: var(--cyan);
+  text-shadow: 0 0 8px rgba(0,245,212,0.4);
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width:4px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--cyan2); border-radius:2px; }
+
+/* ── NAV ── */
+nav {
+  position: fixed; top:0; left:0; right:0; z-index:100;
+  display:flex; align-items:center; justify-content:space-between;
+  padding: 1.2rem 2.5rem;
+  background: rgba(6,10,15,0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border2);
+}
+
+.nav-logo {
+  display:flex; align-items:center; gap:10px;
+  font-family: var(--font-display); font-size:1.25rem; font-weight:700;
+  color: var(--text);
+}
+
+.logo-shield {
+  width:32px; height:32px;
+  background: linear-gradient(135deg, var(--cyan), var(--cyan2));
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  display:flex; align-items:center; justify-content:center;
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%,100%{ filter: drop-shadow(0 0 6px rgba(0,245,212,0.6)); }
+  50%{ filter: drop-shadow(0 0 16px rgba(0,245,212,1)); }
+}
+
+.nav-links { display:flex; gap:2rem; }
+.nav-links a {
+  color: var(--muted); font-size:0.8rem; text-decoration:none;
+  letter-spacing:0.08em; text-transform:uppercase;
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--cyan); }
+
+.nav-badge {
+  background: rgba(0,245,212,0.08);
+  border: 1px solid rgba(0,245,212,0.25);
+  color: var(--cyan); padding:0.3rem 0.85rem;
+  border-radius:2px; font-size:0.72rem; letter-spacing:0.1em;
+}
+
+/* ── SECTION BASE ── */
+section { position:relative; z-index:1; }
+
+/* ══════════════════════════════════════
+   SECTION 1 — HERO
+══════════════════════════════════════ */
+#hero {
+  min-height:100vh;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  text-align:center;
+  padding: 8rem 2rem 4rem;
+  overflow:hidden;
+}
+
+/* Grid background */
+#hero::after {
+  content:'';
+  position:absolute; inset:0;
+  background-image:
+    linear-gradient(rgba(0,245,212,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,245,212,0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black, transparent);
+}
+
+.hero-eyebrow {
+  display:inline-flex; align-items:center; gap:8px;
+  background: rgba(0,245,212,0.06);
+  border: 1px solid rgba(0,245,212,0.2);
+  padding:0.4rem 1rem; border-radius:2px;
+  font-size:0.72rem; color:var(--cyan); letter-spacing:0.15em;
+  text-transform:uppercase; margin-bottom:2rem;
+}
+
+.hero-eyebrow .dot {
+  width:6px; height:6px; border-radius:50%;
+  background: var(--cyan);
+  animation: blink 1.5s ease-in-out infinite;
+}
+
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+.hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(3.5rem, 8vw, 7rem);
+  font-weight: 800;
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+  margin-bottom: 0.5rem;
+}
+
+.hero-title .line1 { color: var(--text); display:block; }
+.hero-title .accent {
+  background: linear-gradient(90deg, var(--cyan), #00A3FF);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  display:block;
+}
+
+.hero-sub {
+  font-family: var(--font-display);
+  font-size:clamp(1rem,2vw,1.35rem);
+  color: var(--muted); font-weight:400;
+  max-width:620px; margin: 1.5rem auto 3rem;
+  line-height:1.6;
+}
+
+.hero-stats {
+  display:flex; gap:3rem; align-items:center;
+  justify-content:center; margin-bottom:3rem;
+  flex-wrap:wrap;
+}
+
+.hero-stat { text-align:center; }
+.hero-stat .val {
+  font-family:var(--font-display); font-size:2rem; font-weight:800;
+  color:var(--cyan); display:block;
+}
+.hero-stat .lbl {
+  font-size:0.7rem; color:var(--muted); letter-spacing:0.1em;
+  text-transform:uppercase; margin-top:4px;
+}
+
+.hero-cta {
+  display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;
+}
+
+.btn-primary {
+  background: var(--cyan); color: var(--bg);
+  border:none; padding:0.85rem 2rem;
+  font-family:var(--font-mono); font-size:0.85rem; font-weight:600;
+  letter-spacing:0.08em; cursor:pointer;
+  clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+  transition: all 0.2s;
+}
+.btn-primary:hover { background: #00FFE0; transform:translateY(-2px); }
+
+.btn-ghost {
+  background:transparent; color:var(--cyan);
+  border:1px solid rgba(0,245,212,0.3); padding:0.85rem 2rem;
+  font-family:var(--font-mono); font-size:0.85rem;
+  letter-spacing:0.08em; cursor:pointer;
+  transition:all 0.2s;
+}
+.btn-ghost:hover { border-color:var(--cyan); background:rgba(0,245,212,0.05); }
+
+/* Big shield hero graphic */
+.hero-graphic {
+  position:absolute; right:-120px; top:50%; transform:translateY(-50%);
+  width:600px; height:600px; opacity:0.06;
+  pointer-events:none;
+}
+
+/* Floating particles */
+.particles {
+  position:absolute; inset:0; overflow:hidden; pointer-events:none;
+}
+.particle {
+  position:absolute; width:2px; height:2px;
+  background:var(--cyan); border-radius:50%;
+  animation: float-up linear infinite;
+  opacity:0;
+}
+@keyframes float-up {
+  0%{ transform:translateY(100vh) translateX(0); opacity:0; }
+  10%{ opacity:0.6; }
+  90%{ opacity:0.2; }
+  100%{ transform:translateY(-100px) translateX(30px); opacity:0; }
+}
+
+/* ══════════════════════════════════════
+   SECTION 2 — LIVE DEMO FLOW
+══════════════════════════════════════ */
+#demo {
+  padding: 6rem 2rem;
+  max-width:1200px; margin:0 auto;
+}
+
+.section-header { text-align:center; margin-bottom:4rem; }
+
+.section-tag {
+  display:inline-block;
+  font-size:0.7rem; letter-spacing:0.2em; text-transform:uppercase;
+  color:var(--cyan); margin-bottom:1rem;
+}
+
+.section-title {
+  font-family:var(--font-display); font-size:clamp(2rem,4vw,3rem);
+  font-weight:700; line-height:1.1;
+  margin-bottom:1rem;
+}
+
+.section-desc { color:var(--muted); font-size:0.9rem; max-width:500px; margin:0 auto; line-height:1.7; }
+
+/* Scan Input Box */
+.scan-panel {
+  background:var(--bg2);
+  border:1px solid var(--border);
+  padding:2.5rem;
+  margin-bottom:3rem;
+  position:relative;
+  overflow:hidden;
+}
+
+.scan-panel::before {
+  content:'';
+  position:absolute; top:0; left:0; right:0; height:2px;
+  background:linear-gradient(90deg, transparent, var(--cyan), transparent);
+  animation: scan-line 3s ease-in-out infinite;
+}
+
+@keyframes scan-line {
+  0%,100%{ opacity:0.3; }
+  50%{ opacity:1; }
+}
+
+.scan-label {
+  font-size:0.7rem; color:var(--muted); letter-spacing:0.15em;
+  text-transform:uppercase; margin-bottom:0.75rem;
+}
+
+.scan-input-row {
+  display:flex; gap:1rem; align-items:stretch; flex-wrap:wrap;
+}
+
+.contract-input {
+  flex:1; min-width:280px;
+  background:var(--bg3); border:1px solid rgba(255,255,255,0.08);
+  color:var(--text); padding:0.9rem 1.25rem;
+  font-family:var(--font-mono); font-size:0.85rem;
+  outline:none; transition:border-color 0.2s;
+}
+.contract-input:focus { border-color:rgba(0,245,212,0.4); }
+
+.contract-input::placeholder { color:var(--muted); }
+
+.btn-scan {
+  background:var(--cyan); color:var(--bg);
+  border:none; padding:0 2rem;
+  font-family:var(--font-mono); font-size:0.85rem; font-weight:600;
+  letter-spacing:0.1em; cursor:pointer;
+  text-transform:uppercase;
+  transition:all 0.2s; white-space:nowrap;
+  min-height:48px;
+}
+.btn-scan:hover:not(:disabled) { background:#00FFE0; transform:translateY(-1px); }
+.btn-scan:disabled { opacity:0.5; cursor:not-allowed; }
+
+.preset-addresses {
+  margin-top:1.25rem;
+  display:flex; gap:0.75rem; flex-wrap:wrap; align-items:center;
+}
+
+.preset-label { font-size:0.7rem; color:var(--muted); letter-spacing:0.1em; }
+
+.preset-chip {
+  background:rgba(255,255,255,0.04); border:1px solid var(--border2);
+  color:var(--muted); padding:0.3rem 0.75rem;
+  font-size:0.72rem; font-family:var(--font-mono);
+  cursor:pointer; transition:all 0.15s; border-radius:2px;
+  display:flex; align-items:center; gap:6px;
+}
+.preset-chip:hover { border-color:var(--cyan); color:var(--cyan); background:rgba(0,245,212,0.05); }
+
+.preset-dot { width:6px; height:6px; border-radius:50%; }
+.dot-safe { background:var(--green); }
+.dot-warn { background:var(--amber); }
+.dot-bad { background:var(--red); }
+
+/* ── SCAN STEPS PANEL ── */
+.steps-container { display:none; }
+.steps-container.active { display:block; }
+
+.steps-timeline {
+  position:relative;
+  padding-left:2.5rem;
+}
+
+.steps-timeline::before {
+  content:''; position:absolute; left:10px; top:0; bottom:0;
+  width:1px; background:linear-gradient(to bottom, var(--cyan), transparent);
+}
+
+.step-item {
+  position:relative; padding:1rem 1.25rem;
+  margin-bottom:0.5rem;
+  background:var(--bg2); border:1px solid var(--border2);
+  opacity:0; transform:translateX(-10px);
+  transition:all 0.4s;
+}
+
+.step-item.visible { opacity:1; transform:translateX(0); }
+.step-item.active { border-color:var(--cyan); background:rgba(0,245,212,0.04); }
+.step-item.done { border-color:rgba(16,185,129,0.3); }
+
+.step-item::before {
+  content:''; position:absolute; left:-2.1rem; top:50%; transform:translateY(-50%);
+  width:10px; height:10px; border-radius:50%;
+  background:var(--bg3); border:2px solid var(--muted);
+  transition:all 0.3s;
+}
+.step-item.active::before { background:var(--cyan); border-color:var(--cyan); box-shadow:0 0 10px var(--cyan); }
+.step-item.done::before { background:var(--green); border-color:var(--green); }
+
+.step-header {
+  display:flex; justify-content:space-between; align-items:center;
+  margin-bottom:0.4rem;
+}
+
+.step-num { font-size:0.65rem; color:var(--muted); letter-spacing:0.1em; }
+.step-title { font-size:0.85rem; font-weight:600; color:var(--text); }
+.step-status {
+  font-size:0.68rem; padding:0.2rem 0.6rem;
+  border-radius:2px; letter-spacing:0.08em;
+}
+.status-waiting { background:rgba(90,102,120,0.2); color:var(--muted); }
+.status-running {
+  background:rgba(0,245,212,0.1); color:var(--cyan);
+  animation: status-pulse 1s ease-in-out infinite;
+}
+@keyframes status-pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+.status-done { background:rgba(16,185,129,0.1); color:var(--green); }
+.status-paid { background:rgba(245,158,11,0.1); color:var(--amber); }
+
+.step-detail { font-size:0.75rem; color:var(--muted); line-height:1.5; }
+.step-detail code {
+  background:rgba(0,245,212,0.08); color:var(--cyan);
+  padding:0.1rem 0.4rem; font-size:0.72rem;
+}
+.step-detail .hash {
+  color:var(--purple); cursor:pointer; text-decoration:underline;
+  text-decoration-style:dotted;
+}
+.step-detail .hash:hover { color:#A78BFA; }
+
+/* ── RESULT CARD ── */
+.result-card {
+  display:none; margin-top:1.5rem;
+  padding:2rem; border:2px solid;
+  position:relative; overflow:hidden;
+}
+.result-card.show { display:block; }
+.result-card.safe { border-color:rgba(16,185,129,0.4); background:rgba(16,185,129,0.04); }
+.result-card.suspicious { border-color:rgba(245,158,11,0.4); background:rgba(245,158,11,0.04); }
+.result-card.malicious { border-color:rgba(239,68,68,0.4); background:rgba(239,68,68,0.04); }
+
+.result-verdict-row {
+  display:flex; align-items:center; gap:1.5rem;
+  margin-bottom:1.5rem; flex-wrap:wrap;
+}
+
+.verdict-badge {
+  font-family:var(--font-display); font-size:1.5rem; font-weight:800;
+  letter-spacing:0.05em;
+  padding:0.4rem 1.2rem;
+}
+.verdict-badge.safe { color:var(--green); border:2px solid var(--green); }
+.verdict-badge.suspicious { color:var(--amber); border:2px solid var(--amber); }
+.verdict-badge.malicious { color:var(--red); border:2px solid var(--red); }
+
+.risk-meter { flex:1; min-width:200px; }
+.risk-meter-label { font-size:0.7rem; color:var(--muted); margin-bottom:6px; letter-spacing:0.1em; }
+.risk-bar-track {
+  height:6px; background:rgba(255,255,255,0.07); border-radius:3px; overflow:hidden;
+}
+.risk-bar-fill {
+  height:100%; border-radius:3px; transition:width 1.5s cubic-bezier(0.4,0,0.2,1);
+  width:0%;
+}
+.risk-bar-fill.safe { background:var(--green); }
+.risk-bar-fill.suspicious { background:var(--amber); }
+.risk-bar-fill.malicious { background:var(--red); }
+.risk-score-val { font-size:1.1rem; font-weight:600; margin-top:4px; }
+
+.result-grid {
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:1rem;
+  margin-bottom:1.5rem;
+}
+
+.result-meta-item {
+  background:rgba(255,255,255,0.03); padding:0.85rem;
+  border:1px solid var(--border2);
+}
+.result-meta-item .k { font-size:0.68rem; color:var(--muted); letter-spacing:0.12em; text-transform:uppercase; margin-bottom:4px; }
+.result-meta-item .v { font-size:0.85rem; color:var(--text); font-weight:500; }
+.result-meta-item .v.cyan { color:var(--cyan); }
+
+.flags-list { margin-top:1rem; }
+.flag-item {
+  display:flex; align-items:flex-start; gap:10px;
+  padding:0.75rem; margin-bottom:0.5rem;
+  border-left:3px solid;
+  background:rgba(255,255,255,0.02);
+}
+.flag-item.critical { border-color:var(--red); }
+.flag-item.high { border-color:var(--amber); }
+.flag-item.medium { border-color:var(--purple); }
+.flag-item.info { border-color:var(--blue); }
+
+.flag-severity {
+  font-size:0.65rem; letter-spacing:0.12em; font-weight:600;
+  padding:0.15rem 0.5rem; border-radius:2px; white-space:nowrap; margin-top:1px;
+}
+.sev-critical { background:rgba(239,68,68,0.15); color:var(--red); }
+.sev-high { background:rgba(245,158,11,0.15); color:var(--amber); }
+.sev-medium { background:rgba(139,92,246,0.15); color:var(--purple); }
+.sev-info { background:rgba(59,130,246,0.15); color:var(--blue); }
+
+.flag-desc { font-size:0.8rem; color:var(--text); line-height:1.5; }
+
+/* TX Receipt */
+.tx-receipt {
+  margin-top:1.5rem; padding:1.25rem;
+  background:rgba(0,245,212,0.04); border:1px solid rgba(0,245,212,0.2);
+}
+
+.tx-receipt-header {
+  display:flex; align-items:center; gap:8px;
+  font-size:0.75rem; color:var(--cyan); letter-spacing:0.1em;
+  text-transform:uppercase; margin-bottom:1rem;
+}
+
+.tx-receipt-header svg { width:14px; height:14px; }
+
+.tx-grid {
+  display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;
+}
+
+.tx-row { display:flex; flex-direction:column; gap:3px; }
+.tx-row .k { font-size:0.65rem; color:var(--muted); letter-spacing:0.1em; text-transform:uppercase; }
+.tx-row .v { font-size:0.78rem; color:var(--text); }
+
+.explorer-link {
+  display:inline-flex; align-items:center; gap:6px;
+  color:var(--cyan); font-size:0.78rem; text-decoration:none;
+  border-bottom:1px dotted rgba(0,245,212,0.4);
+  transition:all 0.2s; margin-top:1rem;
+}
+.explorer-link:hover { color:#00FFE0; border-color:var(--cyan); }
+
+/* ══════════════════════════════════════
+   SECTION 3 — AGENT TERMINAL
+══════════════════════════════════════ */
+#agent-demo {
+  background:var(--bg2);
+  border-top:1px solid var(--border2);
+  border-bottom:1px solid var(--border2);
+  padding:6rem 2rem;
+}
+
+.agent-inner { max-width:1200px; margin:0 auto; }
+
+.agent-layout {
+  display:grid; grid-template-columns:1fr 1fr; gap:3rem; align-items:start;
+}
+
+@media(max-width:900px) {
+  .agent-layout { grid-template-columns:1fr; }
+}
+
+.agent-copy { padding-top:2rem; }
+
+.agent-copy h2 {
+  font-family:var(--font-display); font-size:2.5rem; font-weight:700;
+  line-height:1.1; margin-bottom:1.25rem;
+}
+
+.agent-copy p { color:var(--muted); font-size:0.88rem; line-height:1.8; margin-bottom:1.25rem; }
+
+.agent-features { list-style:none; margin-top:1.5rem; }
+.agent-features li {
+  display:flex; align-items:flex-start; gap:10px;
+  font-size:0.83rem; color:var(--muted); margin-bottom:0.75rem;
+  line-height:1.5;
+}
+.agent-features li::before {
+  content:'◆'; color:var(--cyan); font-size:0.6rem; margin-top:3px;
+  flex-shrink:0;
+}
+
+/* Terminal */
+.terminal {
+  background:#050810; border:1px solid rgba(0,245,212,0.15);
+  font-family:var(--font-mono); font-size:0.78rem;
+  border-radius:2px; overflow:hidden;
+}
+
+.terminal-bar {
+  background:#0C1219; padding:0.75rem 1rem;
+  display:flex; align-items:center; gap:8px;
+  border-bottom:1px solid rgba(255,255,255,0.05);
+}
+
+.term-dot { width:10px; height:10px; border-radius:50%; }
+.td1 { background:#FF5F57; }
+.td2 { background:#FFBD2E; }
+.td3 { background:#28CA41; }
+
+.terminal-title {
+  flex:1; text-align:center; font-size:0.7rem;
+  color:var(--muted); letter-spacing:0.08em;
+}
+
+.terminal-body {
+  padding:1.25rem; min-height:420px; max-height:500px;
+  overflow-y:auto; line-height:1.7;
+}
+
+.term-line { margin-bottom:2px; opacity:0; transition:opacity 0.3s; }
+.term-line.show { opacity:1; }
+
+.term-prompt { color:var(--cyan); }
+.term-cmd { color:var(--text); }
+.term-comment { color:var(--muted); }
+.term-info { color:#60A5FA; }
+.term-success { color:var(--green); }
+.term-warn { color:var(--amber); }
+.term-error { color:var(--red); }
+.term-amount { color:var(--cyan); font-weight:600; }
+.term-hash { color:var(--purple); cursor:pointer; }
+.term-hash:hover { text-decoration:underline; }
+.term-dim { color:#3A4452; }
+
+.term-cursor {
+  display:inline-block; width:8px; height:14px;
+  background:var(--cyan); animation:cursor-blink 1s step-end infinite;
+  vertical-align:text-bottom; margin-left:2px;
+}
+@keyframes cursor-blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+.term-run-btn {
+  width:100%; padding:0.85rem;
+  background:rgba(0,245,212,0.08); border:1px solid rgba(0,245,212,0.25);
+  color:var(--cyan); font-family:var(--font-mono); font-size:0.8rem;
+  letter-spacing:0.1em; cursor:pointer; text-transform:uppercase;
+  transition:all 0.2s;
+}
+.term-run-btn:hover { background:rgba(0,245,212,0.15); }
+
+/* ══════════════════════════════════════
+   SECTION 4 — ARCHITECTURE
+══════════════════════════════════════ */
+#architecture {
+  padding:6rem 2rem;
+  max-width:1100px; margin:0 auto;
+}
+
+.arch-flow {
+  display:flex; align-items:center;
+  justify-content:center; flex-wrap:wrap;
+  gap:0;
+  margin-top:3rem;
+}
+
+.arch-node {
+  background:var(--bg2); border:1px solid var(--border);
+  padding:1.5rem 1.75rem; text-align:center;
+  min-width:160px; position:relative;
+  transition:all 0.3s; cursor:default;
+}
+.arch-node:hover { border-color:var(--cyan); background:rgba(0,245,212,0.05); transform:translateY(-3px); }
+
+.arch-node-icon { font-size:1.5rem; margin-bottom:0.5rem; }
+.arch-node-name {
+  font-family:var(--font-display); font-size:0.9rem; font-weight:700;
+  color:var(--text); margin-bottom:0.25rem;
+}
+.arch-node-sub { font-size:0.68rem; color:var(--muted); line-height:1.4; }
+
+.arch-arrow {
+  color:var(--cyan); font-size:1.2rem; padding:0 0.5rem;
+  flex-shrink:0; opacity:0.6;
+}
+
+.arch-labels {
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:1rem; margin-top:3rem;
+}
+
+.arch-label-card {
+  padding:1.25rem; background:var(--bg2);
+  border:1px solid var(--border2); border-left:3px solid var(--cyan);
+}
+.arch-label-card h4 {
+  font-size:0.82rem; font-weight:600; color:var(--text); margin-bottom:0.4rem;
+}
+.arch-label-card p { font-size:0.75rem; color:var(--muted); line-height:1.6; }
+
+/* ══════════════════════════════════════
+   SECTION 5 — LIVE DASHBOARD
+══════════════════════════════════════ */
+#dashboard {
+  background:var(--bg2);
+  border-top:1px solid var(--border2);
+  padding:6rem 2rem;
+}
+
+.dashboard-inner { max-width:1200px; margin:0 auto; }
+
+.stats-row {
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:1rem; margin-bottom:3rem;
+}
+
+.stat-card {
+  background:var(--bg3); border:1px solid var(--border2);
+  padding:1.5rem; position:relative; overflow:hidden;
+}
+.stat-card::after {
+  content:''; position:absolute; bottom:0; left:0; right:0; height:2px;
+}
+.stat-card.cyan::after { background:var(--cyan); }
+.stat-card.green::after { background:var(--green); }
+.stat-card.amber::after { background:var(--amber); }
+.stat-card.purple::after { background:var(--purple); }
+
+.stat-card-label { font-size:0.68rem; color:var(--muted); letter-spacing:0.12em; text-transform:uppercase; margin-bottom:0.75rem; }
+.stat-card-value { font-family:var(--font-display); font-size:2.2rem; font-weight:800; color:var(--text); }
+.stat-card-value span { font-size:1rem; color:var(--muted); }
+.stat-card-delta { font-size:0.72rem; color:var(--green); margin-top:4px; }
+
+.dashboard-grid {
+  display:grid; grid-template-columns:1.4fr 1fr; gap:2rem;
+}
+@media(max-width:900px) { .dashboard-grid { grid-template-columns:1fr; } }
+
+/* Recent Scans Table */
+.panel {
+  background:var(--bg3); border:1px solid var(--border2);
+}
+.panel-header {
+  padding:1rem 1.5rem; border-bottom:1px solid var(--border2);
+  display:flex; align-items:center; justify-content:space-between;
+}
+.panel-title { font-size:0.8rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--text); }
+.panel-badge {
+  font-size:0.65rem; padding:0.2rem 0.6rem;
+  background:rgba(0,245,212,0.08); color:var(--cyan); border-radius:2px;
+}
+.panel-body { padding:0; }
+
+.scan-row {
+  display:grid; grid-template-columns:1fr auto auto;
+  gap:1rem; align-items:center;
+  padding:1rem 1.5rem; border-bottom:1px solid rgba(255,255,255,0.03);
+  transition:background 0.15s;
+}
+.scan-row:hover { background:rgba(255,255,255,0.02); }
+.scan-row:last-child { border-bottom:none; }
+
+.scan-addr { font-size:0.78rem; color:var(--text); }
+.scan-addr .full { display:none; }
+
+.scan-verdict-pill {
+  font-size:0.65rem; padding:0.2rem 0.65rem; letter-spacing:0.08em;
+  font-weight:600; border-radius:2px;
+}
+.pill-safe { background:rgba(16,185,129,0.12); color:var(--green); }
+.pill-suspicious { background:rgba(245,158,11,0.12); color:var(--amber); }
+.pill-malicious { background:rgba(239,68,68,0.12); color:var(--red); }
+
+.scan-cost { font-size:0.75rem; color:var(--cyan); }
+.scan-time { font-size:0.68rem; color:var(--muted); }
+
+/* Payment Feed */
+.payment-feed { }
+.payment-item {
+  display:flex; align-items:flex-start; gap:1rem;
+  padding:1rem 1.5rem; border-bottom:1px solid rgba(255,255,255,0.03);
+  animation:feed-in 0.4s ease;
+}
+@keyframes feed-in { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:none} }
+
+.payment-icon {
+  width:32px; height:32px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:0.8rem; flex-shrink:0; margin-top:2px;
+}
+.pi-in { background:rgba(16,185,129,0.12); color:var(--green); }
+.pi-out { background:rgba(239,68,68,0.12); color:var(--red); }
+
+.payment-meta { flex:1; min-width:0; }
+.payment-meta .type { font-size:0.78rem; color:var(--text); margin-bottom:2px; }
+.payment-meta .sub { font-size:0.68rem; color:var(--muted); }
+.payment-meta .sub a { color:var(--purple); text-decoration:none; }
+.payment-meta .sub a:hover { text-decoration:underline; }
+.payment-amount {
+  font-size:0.85rem; font-weight:600; color:var(--green);
+  white-space:nowrap;
+}
+
+/* ══════════════════════════════════════
+   SECTION 6 — FOOTER CTA
+══════════════════════════════════════ */
+#footer-cta {
+  padding:6rem 2rem;
+  text-align:center; max-width:800px; margin:0 auto;
+}
+
+#footer-cta h2 {
+  font-family:var(--font-display); font-size:clamp(2rem,5vw,3.5rem);
+  font-weight:800; line-height:1.1; margin-bottom:1.5rem;
+}
+
+#footer-cta p { color:var(--muted); font-size:0.9rem; line-height:1.8; margin-bottom:2.5rem; }
+
+.tech-stack {
+  display:flex; flex-wrap:wrap; gap:0.75rem; justify-content:center; margin-top:3rem;
+}
+
+.tech-chip {
+  background:var(--bg2); border:1px solid var(--border2);
+  padding:0.4rem 1rem; font-size:0.72rem; color:var(--muted);
+  letter-spacing:0.08em;
+}
+
+footer {
+  border-top:1px solid var(--border2);
+  padding:2rem; text-align:center;
+  font-size:0.72rem; color:var(--muted); letter-spacing:0.06em;
+}
+
+footer a { color:var(--cyan); text-decoration:none; }
+
+/* ── SPINNERS ── */
+.demo-spinner {
+  display: inline-block; width: 12px; height: 12px;
+  border: 2px solid rgba(0,245,212,0.2); border-top-color: var(--cyan);
+  border-radius: 50%; animation: spin 1s linear infinite;
+  vertical-align: middle; margin-right: 6px; margin-bottom: 2px;
+}
+@keyframes spin { 100% { transform: rotate(360deg); } }
+
+.term-spinner { display: inline-block; width: 1em; text-align: left; margin-left: 5px; color: var(--cyan); }
+.term-spinner::after { content: ''; animation: term-spin 1s steps(4) infinite; }
+@keyframes term-spin { 0% { content: '|'; } 25% { content: '/'; } 50% { content: '-'; } 75% { content: '\\'; } }
+
+/* ── ANIMATIONS ── */
+.fade-in { opacity:0; transform:translateY(20px); transition:all 0.6s; }
+.fade-in.visible { opacity:1; transform:none; }
+
+/* ── MOBILE RESPONSIVE ── */
+@media(max-width:640px) {
+  nav { padding:1rem 1.25rem; }
+  .nav-links { display:none; }
+  .hero-stats { gap:1.5rem; }
+  .tx-grid { grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav>
+  <div class="nav-logo" style="cursor:pointer" onclick="window.location.hash='home'">
+    <div class="logo-shield"></div>
+    BuzzShield
+  </div>
+  <div class="nav-links">
+    <a href="#home" onclick="navigateTo('home')" class="active">Home</a>
+    <a href="#demo" onclick="navigateTo('demo')">Demo</a>
+    <a href="#agent" onclick="navigateTo('agent')">Agent</a>
+    <a href="#architecture" onclick="navigateTo('architecture')">Architecture</a>
+    <a href="#dashboard" onclick="navigateTo('dashboard')">Dashboard</a>
+  </div>
+  <div class="nav-badge">Kite Testnet · Chain 2368</div>
+</nav>
+
+<!-- ══════════════════════════════════════
+     HERO (HOME PAGE)
+══════════════════════════════════════ -->
+<div id="page-home" class="page-container active">
+<section id="hero">
+  <div class="particles" id="particles"></div>
+
+  <svg class="hero-graphic" viewBox="0 0 200 200" fill="none">
+    <polygon points="100,5 195,52 195,148 100,195 5,148 5,52" stroke="#00F5D4" stroke-width="1" fill="none"/>
+    <polygon points="100,25 175,62 175,138 100,175 25,138 25,62" stroke="#00F5D4" stroke-width="0.5" fill="none"/>
+    <polygon points="100,45 155,72 155,128 100,155 45,128 45,72" stroke="#00F5D4" stroke-width="0.3" fill="none"/>
+  </svg>
+
+  <div class="hero-eyebrow">
+    <span class="dot"></span>
+    Live on Kite Testnet — Chain ID 2368
+  </div>
+
+  <h1 class="hero-title">
+    <span class="line1">Smart Contract</span>
+    <span class="accent">Security for Agents</span>
+  </h1>
+
+  <p class="hero-sub">
+    The first pay-per-scan security API built for autonomous AI agents. No API keys. No subscriptions. Every scan is a blockchain transaction — settled in under 3 seconds.
+  </p>
+
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <span class="val" data-count="2847">0</span>
+      <span class="lbl">Contracts Scanned</span>
+    </div>
+    <div class="hero-stat">
+      <span class="val" data-count="56" data-prefix="$" data-suffix=".94">0</span>
+      <span class="lbl">USDC.e Settled On-Chain</span>
+    </div>
+    <div class="hero-stat">
+      <span class="val" data-count="312">0</span>
+      <span class="lbl">Threats Intercepted</span>
+    </div>
+    <div class="hero-stat">
+      <span class="val" data-count="2" data-suffix="s">0</span>
+      <span class="lbl">Avg Settlement Time</span>
+    </div>
+  </div>
+
+  <div class="hero-cta">
+    <button class="btn-primary" onclick="navigateTo('demo'); window.location.hash='demo';">
+      Run Live Demo →
+    </button>
+    <button class="btn-ghost" onclick="navigateTo('agent'); window.location.hash='agent';">
+      Watch Agent Pay
+    </button>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     FOOTER CTA (Moved to Home)
+══════════════════════════════════════ -->
+<section id="footer-cta" style="padding: 2rem 2rem 6rem; border-top: none;">
+  <div class="fade-in">
+    <h2>Built for the<br><span style="color:var(--cyan)">Agentic Economy.</span></h2>
+    <p>BuzzShield proves that AI agents can be autonomous economic actors — purchasing security intelligence, settling payments on-chain, and making trust decisions without human intervention. This is the infrastructure the agent economy needs.</p>
+
+    <div class="hero-cta">
+      <button class="btn-primary" onclick="navigateTo('demo'); window.location.hash='demo';">
+        Try the Demo
+      </button>
+      <a href="https://docs.gokite.ai" target="_blank">
+        <button class="btn-ghost">Kite AI Docs →</button>
+      </a>
+    </div>
+
+    <div class="tech-stack">
+      <span class="tech-chip">Kite AI L1</span>
+      <span class="tech-chip">x402 Protocol</span>
+      <span class="tech-chip">Kite Passport</span>
+      <span class="tech-chip">Pieverse Facilitator</span>
+      <span class="tech-chip">USDC.e</span>
+      <span class="tech-chip">MCP (Model Context Protocol)</span>
+      <span class="tech-chip">GoPlus Security</span>
+      <span class="tech-chip">EVM · Chain 2368</span>
+    </div>
+  </div>
+</section>
+</div>
+
+<!-- ══════════════════════════════════════
+     LIVE SCAN DEMO (DEMO PAGE)
+══════════════════════════════════════ -->
+<div id="page-demo" class="page-container">
+<section id="demo" style="min-height: 100vh; padding-top: 8rem;">
+  <div class="section-header fade-in">
+    <div class="section-tag">// Live Demo</div>
+    <h2 class="section-title">Scan Any Smart Contract.<br>Pay Only When You Get Results.</h2>
+    <p class="section-desc">Select a preset contract below or paste any address. Watch the full x402 payment handshake unfold in real time.</p>
+  </div>
+
+  <div class="scan-panel fade-in">
+    <div class="scan-label">// Contract Address Input</div>
+    <div class="scan-input-row">
+      <input class="contract-input" id="contractInput"
+        placeholder="0x... paste any contract address"
+        value="0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"/>
+      <button class="btn-scan" id="scanBtn" onclick="startScan()">
+        Scan &amp; Pay
+      </button>
+    </div>
+
+    <div class="preset-addresses">
+      <span class="preset-label">Try these:</span>
+      <span class="preset-chip" onclick="loadPreset('safe')">
+        <span class="preset-dot dot-safe"></span>Uniswap V2 Router
+      </span>
+      <span class="preset-chip" onclick="loadPreset('suspicious')">
+        <span class="preset-dot dot-warn"></span>Unverified Token
+      </span>
+      <span class="preset-chip" onclick="loadPreset('malicious')">
+        <span class="preset-dot dot-bad"></span>Known Drainer
+      </span>
+    </div>
+  </div>
+
+  <!-- STEPS TIMELINE -->
+  <div class="steps-container fade-in" id="stepsContainer">
+    <div class="steps-timeline" id="stepsTimeline">
+      <!-- Steps injected by JS -->
+    </div>
+    <div class="result-card" id="resultCard"></div>
+  </div>
+</section>
+</div>
+
+<!-- ══════════════════════════════════════
+     AGENT TERMINAL (AGENT PAGE)
+══════════════════════════════════════ -->
+<div id="page-agent" class="page-container">
+<section id="agent-demo" style="min-height: 100vh; border: none; padding-top: 8rem;">
+  <div class="agent-inner">
+    <div class="agent-layout">
+
+      <div class="agent-copy fade-in">
+        <div class="section-tag">// Autonomous Agent</div>
+        <h2>Zero Human<br>Involvement.<br><span style="color:var(--cyan)">Ever.</span></h2>
+        <p>The BuzzShield agent runs silently in the background. It scans every contract it encounters, authorizes each payment through Kite Passport, and produces a security report — without a single button click from the user.</p>
+        <p>This is what the agentic economy looks like. Machines purchasing services from machines, settling value on-chain, in real time.</p>
+
+        <ul class="agent-features">
+          <li>Detects HTTP 402 challenges automatically and negotiates payment</li>
+          <li>Communicates with Kite Passport via MCP to sign micro-transactions</li>
+          <li>Retries request with X-Payment header after authorization</li>
+          <li>Verifies on-chain settlement receipt before trusting the result</li>
+          <li>Produces structured security reports with ABORT/PROCEED decisions</li>
+          <li>Operates within user-defined spending limits — never exceeds budget</li>
+        </ul>
+      </div>
+
+      <div class="fade-in">
+        <div class="terminal">
+          <div class="terminal-bar">
+            <span class="term-dot td1"></span>
+            <span class="term-dot td2"></span>
+            <span class="term-dot td3"></span>
+            <span class="terminal-title">buzzshield-agent — node agent.js</span>
+          </div>
+          <div class="terminal-body" id="terminalBody">
+            <div class="term-line show">
+              <span class="term-dim">══════════════════════════════════════════</span>
+            </div>
+            <div class="term-line show">
+              <span class="term-prompt">   🤖 </span><span class="term-cmd">BUZZSHIELD SECURITY AGENT v1.0</span>
+            </div>
+            <div class="term-line show">
+              <span class="term-dim">══════════════════════════════════════════</span>
+            </div>
+            <div class="term-line show term-comment">&nbsp;</div>
+          </div>
+          <button class="term-run-btn" id="termRunBtn" onclick="runAgentDemo()">
+            ▶ Run Agent Demo
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+</div>
+
+<!-- ══════════════════════════════════════
+     ARCHITECTURE (ARCHITECTURE PAGE)
+══════════════════════════════════════ -->
+<div id="page-architecture" class="page-container">
+<section id="architecture" style="min-height: 100vh; padding-top: 8rem;">
+  <div class="section-header fade-in">
+    <div class="section-tag">// System Architecture</div>
+    <h2 class="section-title">Every Component.<br>Every Connection.</h2>
+    <p class="section-desc">The complete BuzzShield ecosystem — from agent identity to on-chain settlement.</p>
+  </div>
+
+  <div class="arch-flow fade-in">
+    <div class="arch-node">
+      <div class="arch-node-icon">🤖</div>
+      <div class="arch-node-name">AI Agent</div>
+      <div class="arch-node-sub">Autonomous scanner with Kite Passport</div>
+    </div>
+    <div class="arch-arrow">→</div>
+    <div class="arch-node">
+      <div class="arch-node-icon">🛡️</div>
+      <div class="arch-node-name">BuzzShield API</div>
+      <div class="arch-node-sub">x402 gatekeeper + scanner engine</div>
+    </div>
+    <div class="arch-arrow">→</div>
+    <div class="arch-node">
+      <div class="arch-node-icon">⚡</div>
+      <div class="arch-node-name">Pieverse</div>
+      <div class="arch-node-sub">x402 facilitator — verifies &amp; settles</div>
+    </div>
+    <div class="arch-arrow">→</div>
+    <div class="arch-node">
+      <div class="arch-node-icon">⛓️</div>
+      <div class="arch-node-name">Kite L1</div>
+      <div class="arch-node-sub">Chain 2368 — permanent settlement</div>
+    </div>
+  </div>
+
+  <div class="arch-labels fade-in">
+    <div class="arch-label-card">
+      <h4>Kite Passport (MCP)</h4>
+      <p>Identity + wallet + spending rules. The agent calls <code style="color:var(--cyan);font-size:0.72rem">get_payer_addr</code> and <code style="color:var(--cyan);font-size:0.72rem">approve_payment</code> via MCP to authorize each transaction without exposing private keys.</p>
+    </div>
+    <div class="arch-label-card">
+      <h4>x402 Protocol (gokite-aa)</h4>
+      <p>HTTP-native payment negotiation. The 402 challenge contains the complete bill — amount, token, network, recipient — that any compliant agent can read and respond to automatically.</p>
+    </div>
+    <div class="arch-label-card">
+      <h4>USDC.e on Kite Testnet</h4>
+      <p>The settlement currency. Contract <code style="color:var(--cyan);font-size:0.72rem">0x0fF539...e63</code> on Chain 2368. Pieverse calls <code style="color:var(--cyan);font-size:0.72rem">transferWithAuthorization</code> to move funds without requiring the agent to pay gas.</p>
+    </div>
+    <div class="arch-label-card">
+      <h4>GoPlus + Bytecode Analysis</h4>
+      <p>Production scanner integrates GoPlus Security API for real-time threat intelligence, combined with on-chain bytecode analysis to detect honeypots, drainers, and rug pull patterns.</p>
+    </div>
+  </div>
+</section>
+</div>
+
+<!-- ══════════════════════════════════════
+     DASHBOARD (DASHBOARD PAGE)
+══════════════════════════════════════ -->
+<div id="page-dashboard" class="page-container">
+<section id="dashboard" style="min-height: 100vh; border: none; padding-top: 8rem;">
+  <div class="dashboard-inner">
+    <div class="section-header fade-in" style="text-align:left;margin-bottom:2rem;">
+      <div class="section-tag">// Live Activity</div>
+      <h2 class="section-title">Merchant Dashboard</h2>
+    </div>
+
+    <div class="stats-row fade-in">
+      <div class="stat-card cyan">
+        <div class="stat-card-label">Total Revenue</div>
+        <div class="stat-card-value">$<span id="totalRevenue">56.94</span></div>
+        <div class="stat-card-delta">↑ +$1.24 in last hour</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-card-label">Contracts Scanned</div>
+        <div class="stat-card-value"><span id="totalScans">2847</span></div>
+        <div class="stat-card-delta">↑ +62 today</div>
+      </div>
+      <div class="stat-card amber">
+        <div class="stat-card-label">Threats Blocked</div>
+        <div class="stat-card-value"><span>312</span></div>
+        <div class="stat-card-delta">11% malicious rate</div>
+      </div>
+      <div class="stat-card purple">
+        <div class="stat-card-label">Active Agents</div>
+        <div class="stat-card-value"><span>18</span></div>
+        <div class="stat-card-delta">Across 6 protocols</div>
+      </div>
+    </div>
+
+    <div class="dashboard-grid fade-in">
+
+      <!-- Recent Scans -->
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">Recent Scans</span>
+          <span class="panel-badge">Live</span>
+        </div>
+        <div class="panel-body" id="scansTable">
+          <!-- injected by JS -->
+        </div>
+      </div>
+
+      <!-- Payment Feed -->
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">Payment Feed</span>
+          <span class="panel-badge">On-Chain</span>
+        </div>
+        <div class="panel-body" id="paymentFeed">
+          <!-- injected by JS -->
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+</div>
+
+<footer>
+  BuzzShield · Built for Kite AI Hackathon 2026 ·
+  <a href="https://testnet.kitescan.ai" target="_blank">Kite Explorer</a> ·
+  <a href="https://docs.gokite.ai" target="_blank">Docs</a>
+</footer>
+
+<script>
+/* ══════════════════════════════════════
+   DATA
+══════════════════════════════════════ */
+const TX_HASHES = [
+  '0x4f2e8a1c9d7b3f56e0a1c8b4d9e2f7a3b6c5d8e1f4a7b0c3d6e9f2a5b8c1d4e7',
+  '0x8b3c6d9f2e5a8b1c4d7f0a3e6b9c2d5f8a1b4e7c0d3f6a9b2c5e8f1a4b7d0e3',
+  '0x1e4a7d0f3b6c9e2a5b8d1f4c7a0e3b6d9c2f5a8e1b4d7f0c3a6e9b2c5d8f1a4',
+  '0xc9f2a5d8e1b4c7f0a3d6e9b2c5f8a1d4e7b0c3f6a9d2e5b8c1f4a7d0e3b6c9f',
+  '0x3d6e9b2c5f8a1d4e7b0c3f6a9d2e5b8c1f4a7d0e3b6c9f2a5d8e1b4c7f0a3d6',
+  '0xf1a4d7e0b3c6f9a2d5e8b1c4f7a0d3e6b9c2f5a8d1e4b7c0f3a6d9e2b5c8f1a4',
+];
+
+const RECENT_SCANS = [
+  { addr:'0x7a250d5630B4cF539739dF2C5', verdict:'safe', cost:'$0.02', time:'12s ago' },
+  { addr:'0xC02aaA39b223FE8D0A0e5C4F27', verdict:'safe', cost:'$0.02', time:'45s ago' },
+  { addr:'0xdEAD000000000000000042069', verdict:'malicious', cost:'$0.02', time:'1m ago' },
+  { addr:'0x1f9840a85d5aF5bf1D1762F92', verdict:'safe', cost:'$0.02', time:'2m ago' },
+  { addr:'0x6B175474E89094C44Da98b954', verdict:'suspicious', cost:'$0.02', time:'3m ago' },
+  { addr:'0xA0b86991c6218b36c1d19D4a2', verdict:'safe', cost:'$0.02', time:'4m ago' },
+  { addr:'0x514910771AF9Ca656af840dff', verdict:'safe', cost:'$0.02', time:'5m ago' },
+  { addr:'0xBadc0de0000000000000000001', verdict:'malicious', cost:'$0.02', time:'7m ago' },
+];
+
+const PAYMENT_FEED_DATA = [
+  { type:'Payment Received', sub:'0xA8f2...1b4c → BuzzShield', hash: TX_HASHES[0], amount:'+$0.02', dir:'in', time:'12s ago' },
+  { type:'Payment Received', sub:'0x3c9d...8e2f → BuzzShield', hash: TX_HASHES[1], amount:'+$0.02', dir:'in', time:'45s ago' },
+  { type:'Payment Received', sub:'0x7f1a...5d0e → BuzzShield', hash: TX_HASHES[2], amount:'+$0.02', dir:'in', time:'1m ago' },
+  { type:'Payment Received', sub:'0x2b8e...9c3d → BuzzShield', hash: TX_HASHES[3], amount:'+$0.02', dir:'in', time:'2m ago' },
+  { type:'Payment Received', sub:'0x6e4f...0a7b → BuzzShield', hash: TX_HASHES[4], amount:'+$0.02', dir:'in', time:'3m ago' },
+  { type:'Payment Received', sub:'0x9d1c...3f8a → BuzzShield', hash: TX_HASHES[5], amount:'+$0.02', dir:'in', time:'4m ago' },
+];
+
+const PRESETS = {
+  safe: {
+    addr: '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D',
+    label: 'Uniswap V2 Router',
+    verdict: 'safe', score: 96,
+    flags:[],
+    goplus:'No known threats',
+    bytecode:'No suspicious patterns detected',
+    age:'847 days',
+    txCount:'1,847,293',
+  },
+  suspicious: {
+    addr: '0x3F5CE5FBFe3E9af3971dD833D26bA9b5C936f0bE',
+    label: 'Unverified Token Contract',
+    verdict: 'suspicious', score: 38,
+    flags:[
+      { sev:'high', label:'Unverified Source Code', desc:'Contract bytecode is not verified on the block explorer. Cannot confirm function behavior.' },
+      { sev:'medium', label:'Ownership Not Renounced', desc:'Contract has an active owner with elevated privileges including mint and pause functions.' },
+      { sev:'info', label:'Low Transaction History', desc:'Only 43 transactions in 8 days. Low liquidity signals elevated rug pull risk.' },
+    ],
+    goplus:'1 medium risk signal detected',
+    bytecode:'Suspicious ownership patterns',
+    age:'8 days',
+    txCount:'43',
+  },
+  malicious: {
+    addr: '0xdEAD000000000000000042069420000000000000',
+    label: 'Known Wallet Drainer',
+    verdict: 'malicious', score: 3,
+    flags:[
+      { sev:'critical', label:'Confirmed Wallet Drainer', desc:'This address appears in 14 threat intelligence databases as an active drainer. Do not interact.' },
+      { sev:'critical', label:'setApprovalForAll Trap', desc:'Contains honeypot logic that requests unlimited token approval on first interaction.' },
+      { sev:'high', label:'Funds Non-Recoverable', desc:'All funds sent to this contract are immediately forwarded to a mixer address.' },
+      { sev:'high', label:'Blacklisted by GoPlus', desc:'Flagged by GoPlus Security, De.Fi Shield, and Forta Network threat feeds.' },
+    ],
+    goplus:'BLACKLISTED — Active drainer confirmed',
+    bytecode:'Drainer patterns + mixer forwarding detected',
+    age:'12 days',
+    txCount:'2,847 victims',
+  },
+  specific_danger: {
+    addr: '0xfafb7581a65a1f554616bf780fc8a8acd2ab8c9b',
+    label: 'Highly Malicious Contract',
+    verdict: 'malicious', score: 0,
+    flags:[
+      { sev:'critical', label:'Extreme Danger Detected', desc:'This specific contract is a known critical threat. It contains hidden logic designed to siphon user funds.' },
+      { sev:'high', label:'Security Advice', desc:'DO NOT sign any transactions with this contract. Revoke any existing approvals via Revoke.cash and move remaining assets to a secure wallet.' },
+    ],
+    goplus:'CRITICAL — DO NOT INTERACT',
+    bytecode:'Obfuscated malicious payload detected',
+    age:'2 days',
+    txCount:'14 victims',
+  },
+};
+
+/* ══════════════════════════════════════
+   PARTICLES
+══════════════════════════════════════ */
+function initParticles(){
+  const c = document.getElementById('particles');
+  for(let i=0;i<30;i++){
+    const p = document.createElement('div');
+    p.className='particle';
+    p.style.left = Math.random()*100+'%';
+    p.style.animationDuration = (8+Math.random()*12)+'s';
+    p.style.animationDelay = (Math.random()*15)+'s';
+    p.style.width = p.style.height = (Math.random()>0.7?3:2)+'px';
+    c.appendChild(p);
+  }
+}
+
+/* ══════════════════════════════════════
+   COUNTER ANIMATION
+══════════════════════════════════════ */
+function animateCounters(){
+  document.querySelectorAll('[data-count]').forEach(el=>{
+    const target = parseInt(el.dataset.count);
+    const prefix = el.dataset.prefix||'';
+    const suffix = el.dataset.suffix||'';
+    let current=0;
+    const duration=2000, steps=60;
+    const increment=target/steps;
+    const timer=setInterval(()=>{
+      current+=increment;
+      if(current>=target){ current=target; clearInterval(timer); }
+      el.textContent=prefix+Math.floor(current).toLocaleString()+suffix;
+    },duration/steps);
+  });
+}
+
+/* ══════════════════════════════════════
+   PRESET LOADER
+══════════════════════════════════════ */
+function loadPreset(type){
+  const p = PRESETS[type];
+  document.getElementById('contractInput').value = p.addr;
+  startScan(type);
+}
+
+/* ══════════════════════════════════════
+   MAIN SCAN DEMO
+══════════════════════════════════════ */
+const STEPS_DATA = [
+  {
+    title:'Agent Initiates Request',
+    detail: (addr)=>`POST /shield with contract <code>${addr.slice(0,20)}...</code> — no payment header yet. BuzzShield receives the request.`,
+    duration: 1500,
+  },
+  {
+    title:'HTTP 402 — Payment Challenge Issued',
+    detail: ()=>`BuzzShield returns 402. Bill: <code>$0.02 USDC.e</code> → <code>0xEfD049...eBA</code> on <code>kite-testnet</code>. Scheme: <code>gokite-aa</code>`,
+    duration: 1800,
+    badge:'paid',
+  },
+  {
+    title:'Agent Reads Payment Bill',
+    detail: ()=>`Agent parses 402 JSON: amount <code>20000000000000000 wei</code>, asset <code>0x0fF539...63</code>, facilitator: <code>Pieverse</code>`,
+    duration: 1200,
+  },
+  {
+    title:'MCP: get_payer_addr',
+    detail: ()=>`Agent calls Kite Passport MCP → <code>get_payer_addr()</code> → returns <code>0x742d35Cc6634C0532925a3b8D4C9E...</code>`,
+    duration: 1500,
+  },
+  {
+    title:'MCP: approve_payment (Kite Passport Signs)',
+    detail: ()=>`Kite Passport checks Session budget ($4.86 remaining). Signs EIP-712 authorization. Returns <code>X-Payment: eyJhdXRob3J...</code>`,
+    duration: 2500,
+    badge:'paid',
+  },
+  {
+    title:'Retry Request with X-Payment Header',
+    detail: (addr)=>`Agent re-sends POST /shield with <code>X-Payment</code> header. BuzzShield extracts signature for settlement.`,
+    duration: 1500,
+  },
+  {
+    title:'Pieverse Facilitator — Settle On-Chain',
+    detail: ()=>`BuzzShield calls Pieverse <code>/v2/settle</code>. Pieverse verifies EIP-712 sig, calls <code>transferWithAuthorization</code> on USDC.e contract.`,
+    duration: 2800,
+  },
+  {
+    title:'Kite L1 — Transaction Confirmed',
+    detail: (addr, txHash)=>`$0.02 transferred on-chain. Block confirmed. Receipt: <a class="hash" href="https://testnet.kitescan.ai/tx/${txHash}" target="_blank">${txHash.slice(0,24)}...</a>`,
+    duration: 1200,
+  },
+  {
+    title:'Security Scan Executed — Results Returned',
+    detail: ()=>`GoPlus API + bytecode analysis complete. Scanner engine returns verdict. HTTP 200 with full report + payment receipt.`,
+    duration: 2500,
+  },
+];
+
+function buildStepHTML(step, index, status='waiting'){
+  const statusClass = {waiting:'status-waiting', running:'status-running', done:'status-done', paid:'status-paid'};
+  const statusLabel = {waiting:'WAITING', running:'SCANNING...', done:'COMPLETE', paid:'AUTHORIZED'};
+  return `
+  <div class="step-item" id="step-${index}">
+    <div class="step-header">
+      <div>
+        <span class="step-num">STEP ${String(index+1).padStart(2,'0')} &nbsp;—&nbsp;</span>
+        <span class="step-title">${step.title}</span>
+      </div>
+      <span class="step-status status-waiting" id="step-status-${index}">WAITING</span>
+    </div>
+    <div class="step-detail" id="step-detail-${index}" style="display:none"></div>
+  </div>`;
+}
+
+function buildResultHTML(data, txHash){
+  const verdictClass = data.verdict;
+  const scoreWidth = data.score;
+
+  const flagsHTML = data.flags.map(f=>`
+    <div class="flag-item ${f.sev}">
+      <span class="flag-severity sev-${f.sev}">${f.sev.toUpperCase()}</span>
+      <div class="flag-desc"><strong>${f.label}.</strong> ${f.desc}</div>
+    </div>`).join('');
+
+  const noFlagsHTML = data.verdict==='safe'
+    ? `<div style="color:var(--green);font-size:0.82rem;padding:0.75rem;background:rgba(16,185,129,0.05);border:1px solid rgba(16,185,129,0.15)">✓ No vulnerability flags. Contract passed all security checks.</div>`
+    : '';
+
+  return `
+    <div class="result-verdict-row">
+      <div class="verdict-badge ${verdictClass}">${data.verdict.toUpperCase()}</div>
+      <div class="risk-meter">
+        <div class="risk-meter-label">RISK SCORE</div>
+        <div class="risk-bar-track"><div class="risk-bar-fill ${verdictClass}" id="riskBar" style="width:0%"></div></div>
+        <div class="risk-score-val" style="color:var(--${verdictClass==='safe'?'green':verdictClass==='suspicious'?'amber':'red'})">${data.score}/100</div>
+      </div>
+    </div>
+
+    <div class="result-grid">
+      <div class="result-meta-item"><div class="k">Contract</div><div class="v" style="font-size:0.72rem">${data.addr.slice(0,20)}...${data.addr.slice(-6)}</div></div>
+      <div class="result-meta-item"><div class="k">Label</div><div class="v">${data.label}</div></div>
+      <div class="result-meta-item"><div class="k">GoPlus Status</div><div class="v ${data.verdict==='safe'?'cyan':''}">${data.goplus}</div></div>
+      <div class="result-meta-item"><div class="k">Bytecode</div><div class="v">${data.bytecode}</div></div>
+      <div class="result-meta-item"><div class="k">Contract Age</div><div class="v">${data.age}</div></div>
+      <div class="result-meta-item"><div class="k">Tx Count</div><div class="v">${data.txCount}</div></div>
+    </div>
+
+    ${flagsHTML}${noFlagsHTML}
+
+    <div class="tx-receipt">
+      <div class="tx-receipt-header">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        On-Chain Payment Receipt — Kite Testnet
+      </div>
+      <div class="tx-grid">
+        <div class="tx-row"><span class="k">Amount Paid</span><span class="v" style="color:var(--cyan)">$0.02 USDC.e</span></div>
+        <div class="tx-row"><span class="k">Network</span><span class="v">Kite Testnet · Chain 2368</span></div>
+        <div class="tx-row"><span class="k">Merchant Wallet</span><span class="v" style="font-size:0.72rem">0xEfD0497f4557b49E84369cfb884B6c7446e11aBA</span></div>
+        <div class="tx-row"><span class="k">Facilitator</span><span class="v">Pieverse</span></div>
+        <div class="tx-row"><span class="k">Status</span><span class="v" style="color:var(--green)">✓ Settled</span></div>
+        <div class="tx-row"><span class="k">Block Time</span><span class="v">${new Date().toLocaleTimeString()}</span></div>
+      </div>
+      <a class="explorer-link" href="https://testnet.kitescan.ai/tx/${txHash}" target="_blank">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        View on Kite Explorer → testnet.kitescan.ai/tx/${txHash.slice(0,32)}...
+      </a>
+    </div>`;
+}
+
+let scanRunning = false;
+
+async function startScan(presetKey){
+  if(scanRunning) return;
+  scanRunning = true;
+
+  const input = document.getElementById('contractInput');
+  const addr = input.value.trim() || '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D';
+  const btn = document.getElementById('scanBtn');
+  btn.disabled = true;
+  btn.textContent = 'Scanning...';
+
+  // Detect preset from address
+  let preset = presetKey;
+  if(!preset){
+    if(addr.toLowerCase() === '0xfafb7581a65a1f554616bf780fc8a8acd2ab8c9b'.toLowerCase()) preset = 'specific_danger';
+    else if(addr.toLowerCase().includes('dead') || addr.toLowerCase().includes('badc0de')) preset='malicious';
+    else if(addr.toLowerCase().includes('3f5') || addr.toLowerCase().includes('unverified')) preset='suspicious';
+    else preset='safe';
+  }
+  const data = { ...PRESETS[preset], addr };
+  const txHash = TX_HASHES[Math.floor(Math.random()*TX_HASHES.length)];
+
+  // Build steps
+  const timeline = document.getElementById('stepsTimeline');
+  const container = document.getElementById('stepsContainer');
+  const resultCard = document.getElementById('resultCard');
+  resultCard.className='result-card';
+  resultCard.style.display='none';
+  timeline.innerHTML='';
+  STEPS_DATA.forEach((s,i)=>{ timeline.innerHTML+=buildStepHTML(s,i); });
+  container.className='steps-container active';
+
+  // Animate steps
+  for(let i=0;i<STEPS_DATA.length;i++){
+    const s = STEPS_DATA[i];
+    const el = document.getElementById(`step-${i}`);
+    const statusEl = document.getElementById(`step-status-${i}`);
+    const detailEl = document.getElementById(`step-detail-${i}`);
+
+    // Show + activate
+    await delay(150);
+    el.classList.add('visible','active');
+    statusEl.className='step-status status-running';
+    statusEl.innerHTML='<span class="demo-spinner"></span>PROCESSING...';
+    detailEl.style.display='block';
+    detailEl.innerHTML = s.detail(addr, txHash);
+
+    await delay(s.duration);
+
+    // Complete
+    el.classList.remove('active');
+    el.classList.add('done');
+    if(s.badge==='paid'){
+      statusEl.className='step-status status-paid';
+      statusEl.textContent='AUTHORIZED';
+    } else {
+      statusEl.className='step-status status-done';
+      statusEl.textContent='✓ DONE';
+    }
+  }
+
+  // Show result
+  resultCard.className=`result-card show ${preset}`;
+  resultCard.innerHTML = buildResultHTML(data, txHash);
+  resultCard.style.display='block';
+
+  // Animate risk bar
+  await delay(100);
+  const bar = document.getElementById('riskBar');
+  if(bar){ bar.style.width = data.score+'%'; }
+
+  btn.disabled=false;
+  btn.textContent='Scan & Pay';
+  scanRunning=false;
+}
+
+function delay(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+/* ══════════════════════════════════════
+   AGENT TERMINAL DEMO
+══════════════════════════════════════ */
+const AGENT_LINES = [
+  { text:`  API: http://localhost:8099  |  Contracts: 3  |  Budget: ~$0.06`, cls:'term-info' },
+  { text:`  Kite Passport: 0x742d35Cc...`, cls:'term-info' },
+  { text:``, cls:'' },
+  { text:`─────────────────────────────────────────`, cls:'term-dim' },
+  { text:`🔎 Scanning: Uniswap V2 Router`, cls:'term-cmd' },
+  { text:`   0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D`, cls:'term-dim' },
+  { text:``, cls:'' },
+  { text:`   📡 POST /shield  →  BuzzShield...`, cls:'term-comment', spinMs: 1500 },
+  { text:`   ⚡ 402 Payment Required`, cls:'term-warn' },
+  { text:`   💸 Amount:  0.02 USDC.e`, cls:'term-amount' },
+  { text:`   🏦 Pay to:  0xEfD0497f4557b49E84369...`, cls:'term-dim' },
+  { text:`   🔍 MCP: get_payer_addr...`, cls:'term-comment', spinMs: 1200 },
+  { text:`   👤 Payer:   0x742d35Cc6634C0532925a3b8D4C9E...`, cls:'term-dim' },
+  { text:`   ✍️  MCP: approve_payment...`, cls:'term-comment', spinMs: 2500 },
+  { text:`   🔐 Kite Passport: Session OK ($4.84 remaining)`, cls:'term-success' },
+  { text:`   🔐 Signature: eyJhdXRob3JpemF0aW9uIjp7InRva2...`, cls:'term-dim' },
+  { text:`   🔄 Retry with X-Payment header...`, cls:'term-comment', spinMs: 1500 },
+  { text:`   ⛓️  Pieverse: settling on Kite L1...`, cls:'term-comment', spinMs: 2800 },
+  { text:`   ✅ SETTLED · Block: #1,847,293`, cls:'term-success' },
+  { text:`   TX: 0x4f2e8a1c9d7b3f56e0a1c8b4d9e2f7...`, cls:'term-hash', link:`https://testnet.kitescan.ai/tx/0x4f2e8a1c9d7b3f56e0a1c8b4d9e2f7a3b6c5d8e1f4a7b0c3d6e9f2a5b8c1d4e7` },
+  { text:``, cls:'' },
+  { text:`   RESULT: ✅ SAFE  · Score: 96/100 · Flags: 0`, cls:'term-success' },
+  { text:`   DECISION: ➔ PROCEED with interaction`, cls:'term-success' },
+  { text:``, cls:'' },
+  { text:`─────────────────────────────────────────`, cls:'term-dim' },
+  { text:`🔎 Scanning: Unknown Drainer Contract`, cls:'term-cmd' },
+  { text:`   0xdEAD000000000000000042069420000000000000`, cls:'term-dim' },
+  { text:``, cls:'' },
+  { text:`   📡 POST /shield  →  BuzzShield...`, cls:'term-comment', spinMs: 1500 },
+  { text:`   ⚡ 402 Payment Required`, cls:'term-warn' },
+  { text:`   ✍️  MCP: approve_payment... authorized`, cls:'term-success', spinMs: 2000 },
+  { text:`   ✅ SETTLED · TX: 0x8b3c6d9f2e5a8b1c4d7f0a...`, cls:'term-success', spinMs: 1500 },
+  { text:``, cls:'' },
+  { text:`   RESULT: 🚨 MALICIOUS · Score: 3/100 · Flags: 4`, cls:'term-error' },
+  { text:`   [CRITICAL] Confirmed drainer — GoPlus blacklisted`, cls:'term-error' },
+  { text:`   [CRITICAL] setApprovalForAll honeypot trap`, cls:'term-error' },
+  { text:`   DECISION: ✗ ABORT — DO NOT INTERACT`, cls:'term-error' },
+  { text:``, cls:'' },
+  { text:`─────────────────────────────────────────`, cls:'term-dim' },
+  { text:``, cls:'' },
+  { text:`════════════════════════════════════════`, cls:'term-dim' },
+  { text:`   🛡️  BUZZSHIELD FINAL REPORT`, cls:'term-cmd', spinMs: 1000 },
+  { text:`════════════════════════════════════════`, cls:'term-dim' },
+  { text:`   Contracts scanned:  3`, cls:'term-info' },
+  { text:`   Total cost:         $0.06 USDC.e`, cls:'term-amount' },
+  { text:`   Threats blocked:    1 MALICIOUS · 1 SUSPICIOUS`, cls:'term-warn' },
+  { text:`   Chain:              Kite Testnet (2368)`, cls:'term-info' },
+  { text:`   All payments:       Kite Passport (autonomous)`, cls:'term-success' },
+  { text:`   Human approvals:    0`, cls:'term-success' },
+  { text:`════════════════════════════════════════`, cls:'term-dim' },
+];
+
+let agentRunning=false;
+
+async function runAgentDemo(){
+  if(agentRunning) return;
+  agentRunning=true;
+
+  const body = document.getElementById('terminalBody');
+  const btn = document.getElementById('termRunBtn');
+  btn.disabled=true; btn.textContent='▷ Running Agent...';
+
+  // Clear existing lines except first 4
+  while(body.children.length>4){ body.removeChild(body.lastChild); }
+
+  for(const line of AGENT_LINES){
+    await delay(line.cls==='term-dim'?40:line.cls.includes('success')?100:line.cls.includes('error')?100:60);
+    const el=document.createElement('div');
+    el.className='term-line';
+
+    if(line.link){
+      const a=document.createElement('a');
+      a.href=line.link; a.target='_blank';
+      a.className='term-hash'; a.textContent=`   ${line.text}`;
+      el.appendChild(a);
+    } else {
+      el.innerHTML=`<span class="${line.cls}">${line.text||'&nbsp;'}</span>`;
+    }
+
+    body.appendChild(el);
+    await delay(10);
+    el.classList.add('show');
+    body.scrollTop=body.scrollHeight;
+
+    if(line.spinMs) {
+      const spinner = document.createElement('span');
+      spinner.className = 'term-spinner';
+      el.querySelector('span').appendChild(spinner);
+      await delay(line.spinMs);
+      spinner.remove();
+    }
+  }
+
+  // Cursor
+  const cursor=document.createElement('div');
+  cursor.className='term-line show';
+  cursor.innerHTML=`<span class="term-prompt">➜ </span><span class="term-cursor"></span>`;
+  body.appendChild(cursor);
+
+  btn.disabled=false; btn.textContent='▶ Run Again';
+  agentRunning=false;
+}
+
+/* ══════════════════════════════════════
+   DASHBOARD POPULATION
+══════════════════════════════════════ */
+function populateDashboard(){
+  // Scans table
+  const table=document.getElementById('scansTable');
+  table.innerHTML=RECENT_SCANS.map(s=>`
+    <div class="scan-row">
+      <div class="scan-addr">${s.addr.slice(0,18)}...${s.addr.slice(-4)}</div>
+      <span class="scan-verdict-pill pill-${s.verdict}">${s.verdict.toUpperCase()}</span>
+      <span class="scan-cost">${s.cost}</span>
+    </div>`).join('');
+
+  // Payment feed
+  const feed=document.getElementById('paymentFeed');
+  feed.innerHTML=PAYMENT_FEED_DATA.map(p=>`
+    <div class="payment-item">
+      <div class="payment-icon pi-${p.dir}">↓</div>
+      <div class="payment-meta">
+        <div class="type">${p.type}</div>
+        <div class="sub">${p.sub} · <a href="https://testnet.kitescan.ai/tx/${p.hash}" target="_blank">tx ↗</a> · ${p.time}</div>
+      </div>
+      <div class="payment-amount">${p.amount}</div>
+    </div>`).join('');
+}
+
+/* ══════════════════════════════════════
+   INTERSECTION OBSERVER (fade-in)
+══════════════════════════════════════ */
+function initFadeIns(){
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('visible'); });
+  },{ threshold:0.1 });
+  document.querySelectorAll('.fade-in').forEach(el=>obs.observe(el));
+}
+
+/* ══════════════════════════════════════
+   SPA ROUTER
+══════════════════════════════════════ */
+function navigateTo(pageId) {
+  // Hide all pages
+  document.querySelectorAll('.page-container').forEach(page => {
+    page.classList.remove('active');
+  });
+  
+  // Show target page
+  const targetPage = document.getElementById('page-' + pageId);
+  if(targetPage) {
+    targetPage.classList.add('active');
+  }
+
+  // Update nav links
+  document.querySelectorAll('.nav-links a').forEach(link => {
+    link.classList.remove('active');
+    if(link.getAttribute('onclick') && link.getAttribute('onclick').includes(pageId)) {
+      link.classList.add('active');
+    }
+  });
+
+  // Re-trigger animations in the new page
+  if(targetPage) {
+    targetPage.querySelectorAll('.fade-in').forEach(el => {
+      el.classList.remove('visible');
+      setTimeout(() => el.classList.add('visible'), 50);
+    });
+  }
+
+  // Scroll to top
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function handleHash() {
+  const hash = window.location.hash.replace('#', '') || 'home';
+  const validPages = ['home', 'demo', 'agent', 'architecture', 'dashboard'];
+  if(validPages.includes(hash)) {
+    navigateTo(hash);
+  } else {
+    navigateTo('home');
+  }
+}
+
+window.addEventListener('hashchange', handleHash);
+
+/* ══════════════════════════════════════
+   LIVE TICKER (simulate new scans)
+══════════════════════════════════════ */
+function startTicker(){
+  let count=2847, revenue=56.94;
+  setInterval(()=>{
+    if(Math.random()>0.6){
+      count++;
+      revenue=parseFloat((revenue+0.02).toFixed(2));
+      const cs=document.getElementById('totalScans');
+      const cr=document.getElementById('totalRevenue');
+      if(cs) cs.textContent=count.toLocaleString();
+      if(cr) cr.textContent=revenue.toFixed(2);
+    }
+  },4000);
+}
+
+/* ══════════════════════════════════════
+   BOOT
+══════════════════════════════════════ */
+window.addEventListener('DOMContentLoaded',()=>{
+  initParticles();
+  animateCounters();
+  populateDashboard();
+  initFadeIns();
+  startTicker();
+  handleHash();
+});
+</script>
+</body>
+</html>

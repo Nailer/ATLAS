@@ -1,0 +1,4184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FrontierX — The Global Work Arena</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Orbitron:wght@400;600;700;900&family=Inter:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --neon-purple: #b341ff;
+            --electric-blue: #00d4ff;
+            --emerald: #00ff87;
+            --red-alert: #ff3b3b;
+            --gold: #ffd700;
+            --bg-deep: #04050a;
+            --bg-panel: #0a0c14;
+            --bg-card: #0e1120;
+            --bg-glass: rgba(14, 17, 32, 0.85);
+            --border-glow: rgba(0, 212, 255, 0.2);
+            --text-primary: #e8eaf6;
+            --text-secondary: #7b83a8;
+            --text-dim: #3d4466;
+            --font-display: 'Orbitron', monospace;
+            --font-ui: 'Rajdhani', sans-serif;
+            --font-body: 'Inter', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: var(--bg-deep);
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            overflow-x: hidden;
+            cursor: default;
+        }
+
+        /* SCROLLBAR */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-panel);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--neon-purple);
+            border-radius: 2px;
+        }
+
+        /* ─── NAV ─── */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            height: 64px;
+            background: rgba(4, 5, 10, 0.92);
+            border-bottom: 1px solid var(--border-glow);
+            backdrop-filter: blur(20px);
+        }
+
+        .nav-logo {
+            font-family: var(--font-display);
+            font-size: 22px;
+            font-weight: 900;
+            background: linear-gradient(90deg, var(--electric-blue), var(--neon-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 2px;
+        }
+
+        .nav-logo span {
+            color: var(--emerald);
+            -webkit-text-fill-color: var(--emerald);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            font-family: var(--font-ui);
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-decoration: none;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--electric-blue);
+        }
+
+        .nav-right {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .live-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 59, 59, 0.15);
+            border: 1px solid rgba(255, 59, 59, 0.4);
+            border-radius: 4px;
+            padding: 4px 10px;
+            font-family: var(--font-ui);
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--red-alert);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .live-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--red-alert);
+            animation: pulse-red 1.2s infinite;
+        }
+
+        @keyframes pulse-red {
+
+            0%,
+            100% {
+                opacity: 1;
+                box-shadow: 0 0 0 0 rgba(255, 59, 59, 0.6);
+            }
+
+            50% {
+                opacity: 0.7;
+                box-shadow: 0 0 0 5px rgba(255, 59, 59, 0);
+            }
+        }
+
+        .btn-nav {
+            font-family: var(--font-ui);
+            font-size: 14px;
+            font-weight: 700;
+            padding: 8px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--electric-blue);
+            color: var(--electric-blue);
+        }
+
+        .btn-outline:hover {
+            background: rgba(0, 212, 255, 0.1);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--neon-purple), var(--electric-blue));
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.88;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 20px rgba(179, 65, 255, 0.4);
+        }
+
+        /* ─── SECTIONS ─── */
+        section {
+            display: none;
+        }
+
+        section.active {
+            display: block;
+        }
+
+        /* ─── HERO ─── */
+        #hero {
+            min-height: 100vh;
+            padding-top: 64px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 80% 60% at 50% -10%, rgba(179, 65, 255, 0.18) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 40% at 80% 50%, rgba(0, 212, 255, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse 40% 30% at 20% 80%, rgba(0, 255, 135, 0.08) 0%, transparent 40%),
+                var(--bg-deep);
+        }
+
+        .hero-grid {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(0, 212, 255, 0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 212, 255, 0.04) 1px, transparent 1px);
+            background-size: 60px 60px;
+            mask-image: radial-gradient(ellipse at center, black 40%, transparent 80%);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 80px 40px 60px;
+        }
+
+        .hero-text {}
+
+        .hero-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 255, 135, 0.08);
+            border: 1px solid rgba(0, 255, 135, 0.25);
+            border-radius: 20px;
+            padding: 5px 14px;
+            margin-bottom: 24px;
+            font-family: var(--font-ui);
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--emerald);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .hero-title {
+            font-family: var(--font-display);
+            font-size: clamp(36px, 4.5vw, 64px);
+            font-weight: 900;
+            line-height: 1.05;
+            margin-bottom: 20px;
+        }
+
+        .hero-title .line1 {
+            display: block;
+            color: var(--text-primary);
+        }
+
+        .hero-title .line2 {
+            display: block;
+            background: linear-gradient(90deg, var(--electric-blue), var(--neon-purple), var(--emerald));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradient-shift 4s ease infinite alternate;
+            background-size: 200%;
+        }
+
+        @keyframes gradient-shift {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            100% {
+                background-position: 100% 50%;
+            }
+        }
+
+        .hero-subtitle {
+            font-size: 17px;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            margin-bottom: 36px;
+            max-width: 520px;
+        }
+
+        .hero-ctas {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+            margin-bottom: 48px;
+        }
+
+        .btn-lg {
+            font-family: var(--font-ui);
+            font-size: 16px;
+            font-weight: 700;
+            padding: 14px 32px;
+            border-radius: 6px;
+            cursor: pointer;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            border: none;
+            transition: all 0.25s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-lg-primary {
+            background: linear-gradient(135deg, var(--neon-purple), var(--electric-blue));
+            color: #fff;
+            box-shadow: 0 0 30px rgba(179, 65, 255, 0.35);
+        }
+
+        .btn-lg-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 40px rgba(179, 65, 255, 0.55);
+        }
+
+        .btn-lg-ghost {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--text-primary);
+        }
+
+        .btn-lg-ghost:hover {
+            border-color: var(--electric-blue);
+            color: var(--electric-blue);
+            background: rgba(0, 212, 255, 0.06);
+        }
+
+        .btn-lg-green {
+            background: linear-gradient(135deg, rgba(0, 255, 135, 0.15), rgba(0, 212, 255, 0.15));
+            border: 1px solid rgba(0, 255, 135, 0.35);
+            color: var(--emerald);
+        }
+
+        .hero-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        .hero-stat {
+            background: rgba(14, 17, 32, 0.7);
+            border: 1px solid var(--border-glow);
+            border-radius: 8px;
+            padding: 14px;
+            backdrop-filter: blur(10px);
+        }
+
+        .hero-stat-val {
+            font-family: var(--font-display);
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--electric-blue);
+        }
+
+        .hero-stat-label {
+            font-family: var(--font-ui);
+            font-size: 11px;
+            color: var(--text-secondary);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-top: 2px;
+        }
+
+        /* ARENA VISUAL */
+        .hero-visual {
+            position: relative;
+        }
+
+        .arena-globe {
+            width: 100%;
+            aspect-ratio: 1/1;
+            max-width: 540px;
+            background: radial-gradient(circle at 40% 40%, rgba(0, 212, 255, 0.08), rgba(179, 65, 255, 0.05), transparent 70%);
+            border: 1px solid rgba(0, 212, 255, 0.15);
+            border-radius: 50%;
+            position: relative;
+            margin: 0 auto;
+            animation: globe-pulse 4s ease infinite;
+        }
+
+        @keyframes globe-pulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 60px rgba(0, 212, 255, 0.12), inset 0 0 60px rgba(179, 65, 255, 0.06);
+            }
+
+            50% {
+                box-shadow: 0 0 100px rgba(0, 212, 255, 0.22), inset 0 0 80px rgba(179, 65, 255, 0.1);
+            }
+        }
+
+        .arena-globe-inner {
+            position: absolute;
+            inset: 15%;
+            border: 1px solid rgba(179, 65, 255, 0.2);
+            border-radius: 50%;
+            animation: rotate-slow 20s linear infinite;
+        }
+
+        .arena-globe-inner2 {
+            position: absolute;
+            inset: 30%;
+            border: 1px solid rgba(0, 255, 135, 0.15);
+            border-radius: 50%;
+            animation: rotate-slow 12s linear infinite reverse;
+        }
+
+        @keyframes rotate-slow {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .floating-cards {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+        }
+
+        .f-card {
+            position: absolute;
+            background: rgba(10, 12, 20, 0.92);
+            border: 1px solid;
+            border-radius: 8px;
+            padding: 10px 14px;
+            backdrop-filter: blur(10px);
+            font-family: var(--font-ui);
+            font-size: 12px;
+            font-weight: 600;
+            animation: float-card 3s ease-in-out infinite;
+            white-space: nowrap;
+        }
+
+        .f-card-1 {
+            border-color: rgba(0, 255, 135, 0.4);
+            color: var(--emerald);
+            top: 8%;
+            left: 2%;
+            animation-delay: 0s;
+        }
+
+        .f-card-2 {
+            border-color: rgba(0, 212, 255, 0.4);
+            color: var(--electric-blue);
+            top: 20%;
+            right: 0%;
+            animation-delay: 0.8s;
+        }
+
+        .f-card-3 {
+            border-color: rgba(179, 65, 255, 0.4);
+            color: var(--neon-purple);
+            bottom: 30%;
+            left: 0%;
+            animation-delay: 1.6s;
+        }
+
+        .f-card-4 {
+            border-color: rgba(255, 215, 0, 0.4);
+            color: var(--gold);
+            bottom: 15%;
+            right: 5%;
+            animation-delay: 2.2s;
+        }
+
+        .f-card-5 {
+            border-color: rgba(255, 59, 59, 0.4);
+            color: var(--red-alert);
+            top: 50%;
+            right: 2%;
+            animation-delay: 1s;
+        }
+
+        @keyframes float-card {
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-8px);
+            }
+        }
+
+        .f-card-dot {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            margin-right: 5px;
+            vertical-align: middle;
+        }
+
+        .dot-green {
+            background: var(--emerald);
+            box-shadow: 0 0 6px var(--emerald);
+        }
+
+        .dot-blue {
+            background: var(--electric-blue);
+            box-shadow: 0 0 6px var(--electric-blue);
+        }
+
+        .dot-purple {
+            background: var(--neon-purple);
+            box-shadow: 0 0 6px var(--neon-purple);
+        }
+
+        /* SPONSOR STRIP */
+        .sponsor-strip {
+            border-top: 1px solid var(--border-glow);
+            border-bottom: 1px solid var(--border-glow);
+            padding: 16px 0;
+            overflow: hidden;
+            position: relative;
+            background: rgba(10, 12, 20, 0.5);
+        }
+
+        .sponsor-track {
+            display: flex;
+            gap: 60px;
+            width: max-content;
+            animation: scroll-left 25s linear infinite;
+        }
+
+        @keyframes scroll-left {
+            from {
+                transform: translateX(0);
+            }
+
+            to {
+                transform: translateX(-50%);
+            }
+        }
+
+        .sponsor-item {
+            font-family: var(--font-display);
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-dim);
+            letter-spacing: 2px;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sponsor-item span {
+            color: var(--text-secondary);
+        }
+
+        /* ─── TICKER ─── */
+        .activity-ticker {
+            background: rgba(0, 255, 135, 0.04);
+            border-bottom: 1px solid rgba(0, 255, 135, 0.1);
+            padding: 8px 0;
+            overflow: hidden;
+        }
+
+        .ticker-track {
+            display: flex;
+            gap: 40px;
+            width: max-content;
+            animation: scroll-left 18s linear infinite;
+        }
+
+        .ticker-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--font-ui);
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        .ticker-name {
+            color: var(--electric-blue);
+            font-weight: 600;
+        }
+
+        .ticker-action {
+            color: var(--text-secondary);
+        }
+
+        .ticker-amount {
+            color: var(--emerald);
+            font-weight: 700;
+        }
+
+        .ticker-sep {
+            color: var(--text-dim);
+        }
+
+        /* ─── COMMON SECTION STYLES ─── */
+        .section-wrap {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 80px 40px;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 56px;
+        }
+
+        .section-tag {
+            display: inline-block;
+            font-family: var(--font-ui);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--electric-blue);
+            margin-bottom: 12px;
+        }
+
+        .section-title {
+            font-family: var(--font-display);
+            font-size: clamp(28px, 3vw, 44px);
+            font-weight: 900;
+            margin-bottom: 12px;
+            line-height: 1.1;
+        }
+
+        .section-sub {
+            font-size: 16px;
+            color: var(--text-secondary);
+            max-width: 560px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* ─── BOUNTY GRID ─── */
+        #bounties {
+            background: var(--bg-deep);
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 36px;
+        }
+
+        .filter-btn {
+            font-family: var(--font-ui);
+            font-size: 13px;
+            font-weight: 700;
+            padding: 7px 18px;
+            border-radius: 4px;
+            cursor: pointer;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            border: 1px solid var(--border-glow);
+            background: transparent;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+
+        .filter-btn.active,
+        .filter-btn:hover {
+            background: rgba(0, 212, 255, 0.1);
+            border-color: var(--electric-blue);
+            color: var(--electric-blue);
+        }
+
+        .bounty-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 20px;
+        }
+
+        .bounty-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-glow);
+            border-radius: 12px;
+            padding: 22px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .bounty-card:hover {
+            border-color: rgba(0, 212, 255, 0.4);
+            box-shadow: 0 4px 30px rgba(0, 212, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .bounty-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+        }
+
+        .card-hot::before {
+            background: linear-gradient(90deg, var(--neon-purple), var(--electric-blue));
+        }
+
+        .card-mega::before {
+            background: linear-gradient(90deg, var(--gold), #ff8c00);
+        }
+
+        .card-ai::before {
+            background: linear-gradient(90deg, var(--emerald), var(--electric-blue));
+        }
+
+        .card-design::before {
+            background: linear-gradient(90deg, var(--neon-purple), #ff6b9d);
+        }
+
+        .bounty-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 14px;
+        }
+
+        .bounty-sponsor {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--font-ui);
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .sponsor-logo {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-display);
+            font-size: 10px;
+            font-weight: 900;
+        }
+
+        .bounty-badge {
+            font-family: var(--font-ui);
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            padding: 3px 8px;
+            border-radius: 3px;
+        }
+
+        .badge-live {
+            background: rgba(255, 59, 59, 0.15);
+            color: var(--red-alert);
+            border: 1px solid rgba(255, 59, 59, 0.3);
+        }
+
+        .badge-hot {
+            background: rgba(255, 140, 0, 0.15);
+            color: #ff8c00;
+            border: 1px solid rgba(255, 140, 0, 0.3);
+        }
+
+        .badge-featured {
+            background: rgba(255, 215, 0, 0.15);
+            color: var(--gold);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .badge-ai {
+            background: rgba(0, 255, 135, 0.1);
+            color: var(--emerald);
+            border: 1px solid rgba(0, 255, 135, 0.3);
+        }
+
+        .bounty-title {
+            font-family: var(--font-ui);
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+
+        .bounty-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin-bottom: 14px;
+        }
+
+        .bounty-tags {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        .tag {
+            font-family: var(--font-ui);
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            padding: 3px 9px;
+            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: var(--text-secondary);
+        }
+
+        .bounty-meta {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .meta-item {}
+
+        .meta-label {
+            font-family: var(--font-ui);
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-dim);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .meta-val {
+            font-family: var(--font-ui);
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-top: 2px;
+        }
+
+        .meta-val.green {
+            color: var(--emerald);
+        }
+
+        .meta-val.blue {
+            color: var(--electric-blue);
+        }
+
+        .meta-val.gold {
+            color: var(--gold);
+        }
+
+        .bounty-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .prize-pool {
+            display: flex;
+            align-items: baseline;
+            gap: 4px;
+        }
+
+        .prize-amount {
+            font-family: var(--font-display);
+            font-size: 26px;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--emerald), var(--electric-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .prize-token {
+            font-family: var(--font-ui);
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .btn-enter {
+            font-family: var(--font-ui);
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 9px 20px;
+            border-radius: 5px;
+            background: linear-gradient(135deg, var(--neon-purple), var(--electric-blue));
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-enter:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 15px rgba(179, 65, 255, 0.4);
+        }
+
+        .bounty-participants {
+            display: flex;
+            align-items: center;
+            gap: -6px;
+            margin-top: 12px;
+        }
+
+        .participant-av {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid var(--bg-card);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 700;
+            margin-left: -6px;
+        }
+
+        .participant-av:first-child {
+            margin-left: 0;
+        }
+
+        .participant-count {
+            font-family: var(--font-ui);
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-left: 8px;
+        }
+
+        .ai-badge-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .ai-indicator {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-family: var(--font-ui);
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--emerald);
+            background: rgba(0, 255, 135, 0.08);
+            border: 1px solid rgba(0, 255, 135, 0.2);
+            padding: 2px 8px;
+            border-radius: 3px;
+        }
+
+        .ai-indicator-off {
+            color: var(--text-dim);
+            background: rgba(255, 255, 255, 0.03);
+            border-color: rgba(255, 255, 255, 0.06);
+        }
+
+        .deposit-note {
+            font-size: 11px;
+            color: #ff8c00;
+            background: rgba(255, 140, 0, 0.08);
+            border: 1px solid rgba(255, 140, 0, 0.2);
+            border-radius: 3px;
+            padding: 3px 8px;
+            font-family: var(--font-ui);
+            font-weight: 600;
+        }
+
+        .progress-bar-wrap {
+            height: 3px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 2px;
+            margin: 10px 0;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            border-radius: 2px;
+            transition: width 0.3s;
+        }
+
+        /* ─── ARENA PAGE ─── */
+        #arena {
+            background: var(--bg-deep);
+        }
+
+        .arena-layout {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 24px;
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 80px 40px;
+        }
+
+        .arena-main {}
+
+        .arena-header {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-glow);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .arena-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--neon-purple), var(--electric-blue), var(--emerald));
+        }
+
+        .arena-title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .arena-name {
+            font-family: var(--font-display);
+            font-size: 22px;
+            font-weight: 900;
+            color: var(--text-primary);
+        }
+
+        .arena-sponsor-name {
+            font-family: var(--font-ui);
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .arena-timer {
+            font-family: var(--font-display);
+            font-size: 36px;
+            font-weight: 900;
+            color: var(--electric-blue);
+            letter-spacing: 2px;
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+        }
+
+        .arena-timer span {
+            font-size: 14px;
+            color: var(--text-dim);
+        }
+
+        .arena-info-row {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 14px;
+        }
+
+        .arena-info-item {}
+
+        .arena-info-label {
+            font-family: var(--font-ui);
+            font-size: 10px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--text-dim);
+        }
+
+        .arena-info-val {
+            font-family: var(--font-display);
+            font-size: 18px;
+            font-weight: 700;
+            margin-top: 2px;
+        }
+
+        /* SUBMISSION PANEL */
+        .submission-panel {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-glow);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .submission-panel h3 {
+            font-family: var(--font-ui);
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .submission-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .submission-item:last-child {
+            border-bottom: none;
+        }
+
+        .sub-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 700;
+            border: 2px solid;
+        }
+
+        .sub-info {
+            flex: 1;
+        }
+
+        .sub-name {
+            font-family: var(--font-ui);
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .sub-detail {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 1px;
+        }
+
+        .sub-score {
+            text-align: right;
+        }
+
+        .score-val {
+            font-family: var(--font-display);
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .score-change {
+            font-family: var(--font-ui);
+            font-size: 11px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            justify-content: flex-end;
+            margin-top: 2px;
+        }
+
+        .score-up {
+            color: var(--emerald);
+        }
+
+        .score-down {
+            color: var(--red-alert);
+        }
+
+        .score-new {
+            color: var(--gold);
+        }
+
+        /* AI EVAL STREAM */
+        .ai-stream {
+            background: var(--bg-panel);
+            border: 1px solid rgba(0, 255, 135, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .ai-stream h3 {
+            font-family: var(--font-ui);
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--emerald);
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ai-log {
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.8;
+        }
+
+        .ai-log-line {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 2px;
+        }
+
+        .ai-log-time {
+            color: var(--text-dim);
+            flex-shrink: 0;
+        }
+
+        .ai-log-text {}
+
+        .ai-log-text.info {
+            color: var(--text-secondary);
+        }
+
+        .ai-log-text.success {
+            color: var(--emerald);
+        }
+
+        .ai-log-text.warn {
+            color: #ff8c00;
+        }
+
+        .ai-log-text.score {
+            color: var(--electric-blue);
+        }
+
+        /* ARENA SIDEBAR */
+        .arena-sidebar {}
+
+        .leaderboard-card {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-glow);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .leaderboard-card h3 {
+            font-family: var(--font-ui);
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+        }
+
+        .lb-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            transition: all 0.3s;
+        }
+
+        .lb-item:last-child {
+            border-bottom: none;
+        }
+
+        .lb-rank {
+            width: 26px;
+            text-align: center;
+            font-family: var(--font-display);
+            font-size: 14px;
+            font-weight: 900;
+        }
+
+        .rank-1 {
+            color: var(--gold);
+        }
+
+        .rank-2 {
+            color: #c0c0c0;
+        }
+
+        .rank-3 {
+            color: #cd7f32;
+        }
+
+        .rank-other {
+            color: var(--text-dim);
+        }
+
+        .lb-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .lb-info {
+            flex: 1;
+        }
+
+        .lb-name {
+            font-family: var(--font-ui);
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .lb-country {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        .lb-score {
+            font-family: var(--font-display);
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--electric-blue);
+        }
+
+        .lb-move {
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .lb-move.up {
+            color: var(--emerald);
+        }
+
+        .lb-move.down {
+            color: var(--red-alert);
+        }
+
+        .lb-item.highlight-gold {
+            background: rgba(255, 215, 0, 0.04);
+            border-radius: 6px;
+        }
+
+        .spectators-card {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-glow);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .spectators-card h3 {
+            font-family: var(--font-ui);
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+
+        .spectator-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: -4px;
+            margin-bottom: 8px;
+        }
+
+        .spec-av {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 2px solid var(--bg-panel);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            margin-left: -6px;
+        }
+
+        .spec-av:first-child {
+            margin-left: 0;
+        }
+
+        .spec-count {
+            font-family: var(--font-ui);
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .spec-count strong {
+            color: var(--electric-blue);
+        }
+
+        .payout-card {
+            background: linear-gradient(135deg, rgba(0, 255, 135, 0.05), rgba(0, 212, 255, 0.05));
+            border: 1px solid rgba(0, 255, 135, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .payout-card h3 {
+            font-family: var(--font-ui);
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--emerald);
+            margin-bottom: 14px;
+        }
+
+        .payout-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .payout-rank-label {
+            font-family: var(--font-ui);
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .payout-amount-val {
+            font-family: var(--font-display);
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        /* ─── PROFILE ─── */
+        #profile {
+            background: var(--bg-deep);
+        }
+
+        .profile-layout {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 80px 40px;
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 28px;
+        }
+
+        .profile-sidebar-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-glow);
+            border-radius: 14px;
+            overflow: hidden;
+        }
+
+        .profile-banner {
+            height: 100px;
+            background: linear-gradient(135deg, rgba(179, 65, 255, 0.3), rgba(0, 212, 255, 0.2), rgba(0, 255, 135, 0.1));
+            position: relative;
+        }
+
+        .profile-avatar-wrap {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            margin-top: -40px;
+            margin-bottom: 16px;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 3px solid var(--bg-card);
+            background: linear-gradient(135deg, var(--neon-purple), var(--electric-blue));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-display);
+            font-size: 28px;
+            font-weight: 900;
+            color: #fff;
+        }
+
+        .profile-badge-icon {
+            position: absolute;
+            bottom: 2px;
+            right: calc(50% - 46px);
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--gold);
+            border: 2px solid var(--bg-card);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+        }
+
+        .profile-info {
+            padding: 0 20px 20px;
+            text-align: center;
+        }
+
+        .profile-name {
+            font-family: var(--font-display);
+            font-size: 18px;
+            font-weight: 900;
+            color: var(--text-primary);
+        }
+
+        .profile-handle {
+            font-family: var(--font-ui);
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .profile-rank-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 4px;
+            padding: 4px 12px;
+            margin-bottom: 16px;
+            font-family: var(--font-ui);
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--gold);
+            letter-spacing: 1px;
+        }
+
+        .profile-stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .profile-stat-box {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .profile-stat-box .val {
+            font-family: var(--font-display);
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--electric-blue);
+        }
+
+        .profile-stat-box .label {
+            font-family: var(--font-ui);
+            font-size: 10px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 2px;
+        }
+
+        .reputation-score {
+            background: linear-gradient(135deg, rgba(179, 65, 255, 0.1), rgba(0, 212, 255, 0.1));
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
+        .rep-score-val {
+            font-family: var(--font-display);
+            font-size: 32px;
+            font-weight: 900;
+            color: var(--electric-blue);
+        }
+
+        .rep-score-label {
+            font-family: var(--font-ui);
+            font-size: 11px;
+            color: var(--text-secondary);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .rep-bar-wrap {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 3px;
+            margin-top: 8px;
+        }
+
+        .rep-bar-fill {
+            height: 100%;
+            border-radius: 3px;
+            background: linear-gradient(90deg, var(--neon-purple), var(--electric-blue));
+        }
+
+        .profile-main {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .profile-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-glow);
+            border-radius: 14px;
+            padding: 22px;
+        }
+
+        .profile-card h3 {
+            font-family: var(--font-ui);
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: space-between;
+        }
+
+        .earnings-chart {
+            height: 120px;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            gap: 6px;
+            padding-top: 10px;
+        }
+
+        .chart-bar {
+            flex: 1;
+            background: linear-gradient(180deg, var(--electric-blue), rgba(0, 212, 255, 0.3));
+            border-radius: 3px 3px 0 0;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .chart-bar:hover {
+            background: linear-gradient(180deg, var(--neon-purple), rgba(179, 65, 255, 0.3));
+        }
+
+        .chart-bar-label {
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: var(--font-ui);
+            font-size: 10px;
+            color: var(--text-dim);
+            white-space: nowrap;
+        }
+
+        .total-earnings {
+            font-family: var(--font-display);
+            font-size: 36px;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--emerald), var(--electric-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .earnings-period {
+            font-family: var(--font-ui);
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .skill-radar {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .skill-item {}
+
+        .skill-name {
+            font-family: var(--font-ui);
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .skill-pct {
+            color: var(--electric-blue);
+            font-family: var(--font-display);
+            font-size: 13px;
+        }
+
+        .skill-bar-wrap {
+            height: 5px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 3px;
+        }
+
+        .skill-bar-fill {
+            height: 100%;
+            border-radius: 3px;
+        }
+
+        .nft-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .nft-item {
+            aspect-ratio: 1/1;
+            border-radius: 8px;
+            border: 1px solid;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .nft-item:hover {
+            transform: scale(1.04);
+        }
+
+        .nft-label {
+            font-family: var(--font-ui);
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-top: 4px;
+        }
+
+        .recent-arenas {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .recent-arena-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .arena-result {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-display);
+            font-size: 12px;
+            font-weight: 900;
+            flex-shrink: 0;
+        }
+
+        .result-win {
+            background: rgba(0, 255, 135, 0.15);
+            color: var(--emerald);
+            border: 1px solid rgba(0, 255, 135, 0.3);
+        }
+
+        .result-top {
+            background: rgba(255, 215, 0, 0.15);
+            color: var(--gold);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .result-mid {
+            background: rgba(0, 212, 255, 0.15);
+            color: var(--electric-blue);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+        }
+
+        .arena-result-info {
+            flex: 1;
+        }
+
+        .arena-result-name {
+            font-family: var(--font-ui);
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .arena-result-detail {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 1px;
+        }
+
+        .arena-result-earn {
+            font-family: var(--font-display);
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--emerald);
+        }
+
+        /* ─── PAYOUT / TRANSACTION ─── */
+        #transaction {
+            background: var(--bg-deep);
+        }
+
+        .tx-wrap {
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 80px 40px;
+        }
+
+        .tx-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(0, 255, 135, 0.3);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .tx-card-header {
+            background: linear-gradient(135deg, rgba(0, 255, 135, 0.08), rgba(0, 212, 255, 0.08));
+            padding: 30px;
+            text-align: center;
+            border-bottom: 1px solid rgba(0, 255, 135, 0.15);
+        }
+
+        .tx-success-icon {
+            font-size: 56px;
+            margin-bottom: 10px;
+            animation: pop-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+        }
+
+        @keyframes pop-in {
+            from {
+                transform: scale(0) rotate(-180deg);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1) rotate(0);
+                opacity: 1;
+            }
+        }
+
+        .tx-card-header h2 {
+            font-family: var(--font-display);
+            font-size: 26px;
+            font-weight: 900;
+            color: var(--emerald);
+            margin-bottom: 6px;
+        }
+
+        .tx-card-header p {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .tx-amount-display {
+            text-align: center;
+            padding: 28px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .tx-usdc {
+            font-family: var(--font-display);
+            font-size: 52px;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--emerald), var(--electric-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .tx-token {
+            font-family: var(--font-ui);
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        .tx-details {
+            padding: 24px;
+        }
+
+        .tx-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .tx-row:last-child {
+            border-bottom: none;
+        }
+
+        .tx-label {
+            font-family: var(--font-ui);
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .tx-val {
+            font-family: var(--font-ui);
+            font-size: 14px;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .tx-val.mono {
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: var(--electric-blue);
+        }
+
+        .tx-hash-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tx-hash-link {
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: var(--electric-blue);
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .tx-hash-link:hover {
+            color: var(--neon-purple);
+            text-decoration: underline;
+        }
+
+        .copy-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-dim);
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .copy-btn:hover {
+            color: var(--electric-blue);
+        }
+
+        .solana-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px;
+            margin: 16px 24px 24px;
+            border: 1px solid rgba(179, 65, 255, 0.2);
+            border-radius: 8px;
+            background: rgba(179, 65, 255, 0.05);
+            font-family: var(--font-ui);
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .solana-logo {
+            font-weight: 900;
+            color: var(--neon-purple);
+        }
+
+        .settlement-speed {
+            color: var(--emerald);
+            font-weight: 700;
+        }
+
+        /* ─── RANKINGS ─── */
+        #rankings {
+            background: var(--bg-deep);
+        }
+
+        .rankings-wrap {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 80px 40px;
+        }
+
+        .rank-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .rank-table thead tr {
+            background: rgba(255, 255, 255, 0.03);
+            border-bottom: 1px solid var(--border-glow);
+        }
+
+        .rank-table th {
+            font-family: var(--font-ui);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            padding: 12px 16px;
+            text-align: left;
+        }
+
+        .rank-table tbody tr {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            transition: background 0.2s;
+            cursor: pointer;
+        }
+
+        .rank-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .rank-table td {
+            padding: 14px 16px;
+        }
+
+        .rank-num {
+            font-family: var(--font-display);
+            font-size: 16px;
+            font-weight: 900;
+            width: 40px;
+        }
+
+        .user-cell {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-av-sm {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .user-av-name {
+            font-family: var(--font-ui);
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .user-av-handle {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .country-flag {
+            font-size: 18px;
+        }
+
+        .rep-chip {
+            display: inline-block;
+            font-family: var(--font-ui);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 9px;
+            border-radius: 3px;
+            letter-spacing: 0.5px;
+        }
+
+        .rep-elite {
+            background: rgba(255, 215, 0, 0.15);
+            color: var(--gold);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .rep-pro {
+            background: rgba(0, 212, 255, 0.1);
+            color: var(--electric-blue);
+            border: 1px solid rgba(0, 212, 255, 0.25);
+        }
+
+        .rep-advanced {
+            background: rgba(179, 65, 255, 0.1);
+            color: var(--neon-purple);
+            border: 1px solid rgba(179, 65, 255, 0.25);
+        }
+
+        .rep-rising {
+            background: rgba(0, 255, 135, 0.1);
+            color: var(--emerald);
+            border: 1px solid rgba(0, 255, 135, 0.25);
+        }
+
+        .earn-cell {
+            font-family: var(--font-display);
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--emerald);
+        }
+
+        .win-cell {
+            font-family: var(--font-display);
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--electric-blue);
+        }
+
+        /* ─── TOAST NOTIFICATIONS ─── */
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+        }
+
+        .toast {
+            background: var(--bg-card);
+            border: 1px solid var(--border-glow);
+            border-radius: 10px;
+            padding: 14px 18px;
+            min-width: 280px;
+            max-width: 340px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            animation: slide-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+            pointer-events: all;
+            backdrop-filter: blur(20px);
+        }
+
+        @keyframes slide-in {
+            from {
+                transform: translateX(100px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slide-out {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+
+            to {
+                transform: translateX(100px);
+                opacity: 0;
+            }
+        }
+
+        .toast-icon {
+            font-size: 20px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .toast-content {
+            flex: 1;
+        }
+
+        .toast-title {
+            font-family: var(--font-ui);
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .toast-sub {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        .toast.toast-earn {
+            border-left: 3px solid var(--emerald);
+        }
+
+        .toast.toast-join {
+            border-left: 3px solid var(--electric-blue);
+        }
+
+        .toast.toast-ai {
+            border-left: 3px solid var(--neon-purple);
+        }
+
+        .toast.toast-warn {
+            border-left: 3px solid #ff8c00;
+        }
+
+        /* ─── PROGRESS UPDATE POPUP ─── */
+        .update-popup {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg-card);
+            border: 1px solid rgba(0, 212, 255, 0.35);
+            border-radius: 12px;
+            padding: 18px 24px;
+            z-index: 9998;
+            display: none;
+            align-items: center;
+            gap: 16px;
+            max-width: 480px;
+            width: 90%;
+            box-shadow: 0 8px 40px rgba(0, 212, 255, 0.15);
+            animation: slide-up 0.4s ease both;
+        }
+
+        .update-popup.show {
+            display: flex;
+        }
+
+        @keyframes slide-up {
+            from {
+                transform: translateX(-50%) translateY(20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .update-popup-icon {
+            font-size: 28px;
+        }
+
+        .update-popup-text h4 {
+            font-family: var(--font-ui);
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--electric-blue);
+        }
+
+        .update-popup-text p {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 3px;
+        }
+
+        .update-close {
+            background: none;
+            border: none;
+            color: var(--text-dim);
+            cursor: pointer;
+            font-size: 18px;
+            margin-left: auto;
+        }
+
+        /* UTILITY */
+        .glow-text-blue {
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+        }
+
+        .glow-text-purple {
+            text-shadow: 0 0 20px rgba(179, 65, 255, 0.5);
+        }
+
+        .glow-text-green {
+            text-shadow: 0 0 20px rgba(0, 255, 135, 0.5);
+        }
+
+        .particles {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            border-radius: 50%;
+            animation: particle-float linear infinite;
+        }
+
+        @keyframes particle-float {
+            0% {
+                transform: translateY(100vh) translateX(0);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            90% {
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(-100px) translateX(var(--drift));
+                opacity: 0;
+            }
+        }
+        /* ─── PARTICIPATION MODAL ─── */
+        .fullscreen-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(4, 5, 10, 0.95);
+            backdrop-filter: blur(20px);
+            z-index: 9999;
+            display: none;
+            overflow-y: auto;
+            color: var(--text-primary);
+        }
+        .fullscreen-modal.show {
+            display: block;
+            animation: modalFadeIn 0.4s ease forwards;
+        }
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.98); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .modal-header {
+            padding: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-title {
+            font-family: var(--font-display);
+            font-size: 28px;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 32px;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        .modal-close:hover {
+            color: var(--red-alert);
+        }
+        .modal-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 40px 80px;
+        }
+        .participation-step {
+            display: none;
+        }
+        .participation-step.active {
+            display: block;
+            animation: stepSlideIn 0.5s ease forwards;
+        }
+        @keyframes stepSlideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Mode Selection */
+        .part-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin-top: 40px;
+        }
+        .part-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-glow);
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        .part-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.15);
+            border-color: var(--electric-blue);
+        }
+        .part-card.autonomous:hover {
+            box-shadow: 0 10px 30px rgba(179, 65, 255, 0.2);
+            border-color: var(--neon-purple);
+        }
+        .part-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        .part-title {
+            font-family: var(--font-display);
+            font-size: 22px;
+            margin-bottom: 15px;
+            color: var(--text-primary);
+        }
+        .part-desc {
+            font-size: 15px;
+            color: var(--text-secondary);
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+        .part-features {
+            list-style: none;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+        .part-features li {
+            font-size: 14px;
+            color: var(--text-dim);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        .part-features li::before {
+            content: "✓";
+            color: var(--emerald);
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        .part-btn {
+            width: 100%;
+            padding: 12px;
+            font-family: var(--font-display);
+            font-size: 16px;
+            font-weight: 600;
+            text-transform: uppercase;
+            border: 1px solid var(--border-glow);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.3s;
+        }
+        .part-card:hover .part-btn {
+            background: var(--electric-blue);
+            color: #000;
+            border-color: var(--electric-blue);
+        }
+        .part-card.autonomous:hover .part-btn {
+            background: var(--neon-purple);
+            color: #fff;
+            border-color: var(--neon-purple);
+        }
+
+        /* AI Deployment Interface */
+        .ai-deployment-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .ai-methods {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+        .ai-method-box {
+            background: var(--bg-panel);
+            border: 1px solid rgba(179, 65, 255, 0.3);
+            border-radius: 12px;
+            padding: 30px;
+        }
+        .ai-method-title {
+            font-family: var(--font-display);
+            font-size: 20px;
+            color: var(--neon-purple);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .form-label {
+            display: block;
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .form-input, .form-select {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-glow);
+            color: var(--text-primary);
+            border-radius: 6px;
+            font-family: var(--font-body);
+            font-size: 15px;
+        }
+        .form-range {
+            width: 100%;
+            accent-color: var(--neon-purple);
+        }
+        
+        .live-preview {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(0, 212, 255, 0.05);
+            border-left: 3px solid var(--electric-blue);
+            border-radius: 4px;
+            text-align: left;
+        }
+        .preview-title {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: var(--electric-blue);
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+        .preview-stat {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .deploy-btn {
+            width: 100%;
+            padding: 16px;
+            font-family: var(--font-display);
+            font-size: 18px;
+            font-weight: 700;
+            text-transform: uppercase;
+            background: linear-gradient(90deg, var(--electric-blue), var(--neon-purple));
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            border-radius: 6px;
+            margin-top: 20px;
+            transition: opacity 0.3s;
+        }
+        .deploy-btn:hover {
+            opacity: 0.9;
+        }
+
+        /* Cinematic Deploy Animation */
+        .deploy-animation {
+            position: absolute;
+            inset: 0;
+            background: var(--bg-deep);
+            z-index: 10;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            display: none;
+        }
+        .deploy-animation.active {
+            display: flex;
+        }
+        .deploy-log {
+            font-family: monospace;
+            color: var(--emerald);
+            font-size: 16px;
+            margin-top: 30px;
+            text-align: left;
+            width: 400px;
+            height: 200px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+        .deploy-log-line {
+            margin-bottom: 5px;
+            opacity: 0;
+            animation: logLineIn 0.2s ease forwards;
+        }
+        @keyframes logLineIn {
+            to { opacity: 1; }
+        }
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(0, 212, 255, 0.2);
+            border-top-color: var(--electric-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        .badge-ended {
+            background: rgba(255, 59, 59, 0.1);
+            color: #ff3b3b;
+            border: 1px solid rgba(255, 59, 59, 0.2);
+        }
+        .winner-box {
+            background: var(--bg-panel);
+            border: 1px solid rgba(0, 255, 135, 0.3);
+            border-radius: 16px;
+            padding: 50px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 50px rgba(0, 255, 135, 0.1);
+        }
+        .winner-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: float 3s ease-in-out infinite;
+        }
+        .claim-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-glow);
+            border-radius: 12px;
+            padding: 40px;
+            margin: 0 auto;
+            max-width: 600px;
+        }
+
+        /* ─── RESPONSIVE / MOBILE STYLES ─── */
+        @media (max-width: 1024px) {
+            .hero-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+                gap: 40px;
+                padding: 40px 20px;
+            }
+            .hero-eyebrow {
+                justify-content: center;
+            }
+            .hero-ctas {
+                justify-content: center;
+            }
+            .live-feed-panel {
+                max-width: 600px;
+                margin: 0 auto;
+            }
+            nav {
+                padding: 0 20px;
+            }
+            .nav-links {
+                gap: 15px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            nav {
+                flex-direction: column;
+                height: auto;
+                padding: 15px 20px;
+                gap: 15px;
+            }
+            .nav-links {
+                width: 100%;
+                overflow-x: auto;
+                padding-bottom: 5px;
+                justify-content: flex-start;
+                white-space: nowrap;
+            }
+            #hero {
+                padding-top: 110px; /* Adjust for larger nav */
+            }
+            .hero-title {
+                font-size: 50px;
+                line-height: 1.1;
+            }
+            .hero-stats {
+                grid-template-columns: 1fr 1fr;
+            }
+            .hero-ctas {
+                flex-direction: column;
+                width: 100%;
+            }
+            .hero-ctas button {
+                width: 100%;
+            }
+            .section-wrap {
+                padding: 40px 20px;
+            }
+            .section-title {
+                font-size: 36px;
+            }
+            .bounty-grid {
+                grid-template-columns: 1fr;
+            }
+            .bounty-meta {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            .ai-badge-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .arena-layout {
+                grid-template-columns: 1fr;
+            }
+            .arena-info-row {
+                grid-template-columns: 1fr 1fr;
+            }
+            .profile-layout {
+                grid-template-columns: 1fr;
+                padding: 40px 20px;
+            }
+            .profile-stats-grid, .skill-radar, .nft-grid, .part-cards, .ai-methods {
+                grid-template-columns: 1fr;
+            }
+            .modal-content {
+                padding: 0 20px 40px;
+            }
+            .winner-box, .claim-card {
+                padding: 25px;
+            }
+            .tx-usdc {
+                font-size: 40px;
+            }
+            .rank-table-wrap, .history-table-wrap, .tx-wrap {
+                overflow-x: auto;
+            }
+            .rank-table, .history-table {
+                white-space: nowrap;
+                min-width: 600px;
+            }
+            .modal-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+                padding: 20px;
+            }
+            .modal-close {
+                position: absolute;
+                top: 20px;
+                right: 20px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .hero-title {
+                font-size: 40px;
+            }
+            .hero-stats {
+                grid-template-columns: 1fr;
+            }
+            .arena-info-row {
+                grid-template-columns: 1fr;
+            }
+            .modal-title {
+                font-size: 22px;
+            }
+            .winner-icon {
+                font-size: 60px;
+            }
+            .tx-usdc {
+                font-size: 32px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAV -->
+    <nav>
+        <div class="nav-logo">FRONTIER<span>X</span></div>
+        <div class="nav-links">
+            <a href="#" class="active" onclick="showSection('hero', event);return false;">Home</a>
+            <a href="#" onclick="showSection('bounties', event);return false;">Bounties</a>
+            <a href="#" onclick="showSection('arena', event);return false;">Live Arena</a>
+            <a href="#" onclick="showSection('rankings', event);return false;">Rankings</a>
+            <a href="#" onclick="showSection('profile', event);return false;">Profile</a>
+            <a href="#" onclick="showSection('transaction', event);return false;">Payouts</a>
+            <a href="#" onclick="showSection('history', event);return false;">History</a>
+        </div>
+        <div class="nav-right">
+            <div class="live-badge">
+                <div class="live-dot"></div>LIVE
+            </div>
+            <button type="button" class="btn-nav btn-outline" onclick="showSection('bounties', event);return false;">Explore</button>
+            <button type="button" class="btn-nav btn-primary" onclick="openParticipationFlow(event);return false;">⚔ Enter Arena</button>
+        </div>
+    </nav>
+
+    <!-- ACTIVITY TICKER -->
+    <div class="activity-ticker" style="margin-top:64px;">
+        <div class="ticker-track" id="ticker">
+            <div class="ticker-item"><span class="ticker-name">Adaeze_Dev</span><span class="ticker-action">🇳🇬 just
+                    earned</span><span class="ticker-amount">+$420 USDC</span><span class="ticker-sep">·</span></div>
+            <div class="ticker-item"><span class="ticker-name">AI-Agent #0x4F2</span><span
+                    class="ticker-action">submitted to</span><span class="ticker-action">Solana Dashboard</span><span
+                    class="ticker-sep">·</span></div>
+            <div class="ticker-item"><span class="ticker-name">KailashR</span><span class="ticker-action">🇮🇳 climbed
+                    to</span><span class="ticker-amount">#3 Leaderboard</span><span class="ticker-sep">·</span></div>
+            <div class="ticker-item"><span class="ticker-name">LagosCreator</span><span class="ticker-action">🇳🇬 won
+                    arena</span><span class="ticker-amount">+$1,200 USDC</span><span class="ticker-sep">·</span></div>
+            <div class="ticker-item"><span class="ticker-name">Stripe x FrontierX</span><span class="ticker-action">🏆
+                    launched $100K bounty</span><span class="ticker-sep">·</span></div>
+            <div class="ticker-item"><span class="ticker-name">OkonkwoBuilds</span><span class="ticker-action">🇳🇬
+                    reputation</span><span class="ticker-amount">+140pts</span><span class="ticker-sep">·</span></div>
+            <div class="ticker-item"><span class="ticker-name">BeatrizSP</span><span class="ticker-action">🇧🇷
+                    submitted design</span><span class="ticker-sep">·</span></div>
+            <div class="ticker-item"><span class="ticker-name">Solana Arena #12</span><span class="ticker-action">now
+                    LIVE —</span><span class="ticker-amount">892 watching</span><span class="ticker-sep">·</span></div>
+            <!-- duplicate for loop -->
+            <div class="ticker-item"><span class="ticker-name">Adaeze_Dev</span><span class="ticker-action">🇳🇬 just
+                    earned</span><span class="ticker-amount">+$420 USDC</span><span class="ticker-sep">·</span></div>
+            <div class="ticker-item"><span class="ticker-name">AI-Agent #0x4F2</span><span
+                    class="ticker-action">submitted to</span><span class="ticker-action">Solana Dashboard</span><span
+                    class="ticker-sep">·</span></div>
+            <div class="ticker-item"><span class="ticker-name">KailashR</span><span class="ticker-action">🇮🇳 climbed
+                    to</span><span class="ticker-amount">#3 Leaderboard</span><span class="ticker-sep">·</span></div>
+            <div class="ticker-item"><span class="ticker-name">LagosCreator</span><span class="ticker-action">🇳🇬 won
+                    arena</span><span class="ticker-amount">+$1,200 USDC</span><span class="ticker-sep">·</span></div>
+            <div class="ticker-item"><span class="ticker-name">Stripe x FrontierX</span><span class="ticker-action">🏆
+                    launched $100K bounty</span><span class="ticker-sep">·</span></div>
+        </div>
+    </div>
+
+    <!-- ═══ HERO ═══ -->
+    <section id="hero" class="active">
+        <div class="hero-bg"></div>
+        <div class="hero-grid"></div>
+        <div class="particles" id="heroParticles"></div>
+
+        <div class="hero-content">
+            <div class="hero-text">
+                <div class="hero-eyebrow">⚡ Powered by Solana · Human + AI Labor</div>
+                <h1 class="hero-title">
+                    <span class="line1">THE GLOBAL</span>
+                    <span class="line2">WORK ARENA</span>
+                </h1>
+                <p class="hero-subtitle">
+                    FrontierX is the world's first competitive labor protocol where <strong
+                        style="color:var(--text-primary)">humans and AI agents</strong> compete in real-time skill
+                    arenas, earn instant USDC payouts, and build on-chain reputations — from Lagos to Singapore.
+                </p>
+                <div class="hero-ctas">
+                    <button type="button" class="btn-lg btn-lg-primary" onclick="openParticipationFlow(event)">⚔ Enter Arena</button>
+                    <button type="button" class="btn-lg btn-lg-ghost" onclick="showSection('arena', event)">👁 Watch Live</button>
+                    <button type="button" class="btn-lg btn-lg-green" onclick="showSection('bounties', event)">💰 Explore Bounties</button>
+                </div>
+                <div class="hero-stats">
+                    <div class="hero-stat">
+                        <div class="hero-stat-val" id="stat-users">48,291</div>
+                        <div class="hero-stat-label">Active Competitors</div>
+                    </div>
+                    <div class="hero-stat">
+                        <div class="hero-stat-val" id="stat-paid">$4.2M</div>
+                        <div class="hero-stat-label">Total Paid Out</div>
+                    </div>
+                    <div class="hero-stat">
+                        <div class="hero-stat-val" id="stat-arenas">317</div>
+                        <div class="hero-stat-label">Live Arenas</div>
+                    </div>
+                    <div class="hero-stat">
+                        <div class="hero-stat-val" id="stat-ai">2,041</div>
+                        <div class="hero-stat-label">AI Agents Online</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hero-visual">
+                <div class="arena-globe">
+                    <div class="arena-globe-inner"></div>
+                    <div class="arena-globe-inner2"></div>
+                    <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
+                        <div style="text-align:center;">
+                            <div
+                                style="font-family:var(--font-display);font-size:13px;color:var(--text-dim);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;">
+                                Live Arenas</div>
+                            <div style="font-family:var(--font-display);font-size:48px;font-weight:900;color:var(--electric-blue);text-shadow:0 0 30px rgba(0,212,255,0.5);"
+                                id="globe-arena-count">317</div>
+                            <div
+                                style="font-family:var(--font-ui);font-size:12px;color:var(--text-secondary);margin-top:4px;">
+                                across 94 countries</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="floating-cards">
+                    <div class="f-card f-card-1"><span class="f-card-dot dot-green"></span>Adaeze_Dev won +$420</div>
+                    <div class="f-card f-card-2"><span class="f-card-dot dot-blue"></span>Arena #41 LIVE · 892
+                        spectators</div>
+                    <div class="f-card f-card-3"><span class="f-card-dot dot-purple"></span>AI-Agent scored 98.4/100
+                    </div>
+                    <div class="f-card f-card-4">🏆 New $25K Bounty — Stripe</div>
+                    <div class="f-card f-card-5"><span class="f-card-dot dot-green"></span>3 payouts in last 60s</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sponsor Strip -->
+        <div class="sponsor-strip">
+            <div class="sponsor-track">
+                <div class="sponsor-item">🟣 <span>SOLANA</span></div>
+                <div class="sponsor-item">💳 <span>RAENEST</span></div>
+                <div class="sponsor-item">🏟 <span>COLOSSEUM</span></div>
+                <div class="sponsor-item">💼 <span>SUPERTEAM</span></div>
+                <div class="sponsor-item">⚡ <span>HELIUS</span></div>
+                <div class="sponsor-item">🔵 <span>CIRCLE USDC</span></div>
+                <div class="sponsor-item">🛡 <span>DRIFT PROTOCOL</span></div>
+                <div class="sponsor-item">🌊 <span>TENSOR</span></div>
+                <div class="sponsor-item">🎮 <span>MAGIC EDEN</span></div>
+                <div class="sponsor-item">🔮 <span>PYTH NETWORK</span></div>
+                <div class="sponsor-item">🟣 <span>SOLANA</span></div>
+                <div class="sponsor-item">💳 <span>RAENEST</span></div>
+                <div class="sponsor-item">🏟 <span>COLOSSEUM</span></div>
+                <div class="sponsor-item">💼 <span>SUPERTEAM</span></div>
+                <div class="sponsor-item">⚡ <span>HELIUS</span></div>
+                <div class="sponsor-item">🔵 <span>CIRCLE USDC</span></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ BOUNTIES ═══ -->
+    <section id="bounties">
+        <div class="section-wrap">
+            <div class="section-header">
+                <div class="section-tag">// Active Bounties</div>
+                <h2 class="section-title">Choose Your Arena</h2>
+                <p class="section-sub">Compete in skill-based challenges. AI judges every submission in real time.
+                    Winners earn instant USDC.</p>
+            </div>
+            <div class="filter-bar">
+                <button type="button" class="filter-btn active">All</button>
+                <button type="button" class="filter-btn">Development</button>
+                <button type="button" class="filter-btn">Design</button>
+                <button type="button" class="filter-btn">AI / Prompt</button>
+                <button type="button" class="filter-btn">Marketing</button>
+                <button type="button" class="filter-btn">Video</button>
+                <button type="button" class="filter-btn">Research</button>
+                <button type="button" class="filter-btn">🔥 Mega Arenas</button>
+            </div>
+            <div class="bounty-grid" id="bountyGrid"></div>
+        </div>
+    </section>
+
+    <!-- ═══ ARENA ═══ -->
+    <section id="arena">
+        <div class="arena-layout">
+            <div class="arena-main">
+                <div class="arena-header">
+                    <div class="arena-title-row">
+                        <div>
+                            <div class="arena-name">⚔ Solana Payment Dashboard · Arena #41</div>
+                            <div class="arena-sponsor-name">Sponsored by <span style="color:var(--electric-blue)">Helius
+                                    Protocol</span> · <span class="badge-live"
+                                    style="font-family:var(--font-ui);font-size:11px;background:rgba(255,59,59,0.15);color:var(--red-alert);padding:2px 8px;border-radius:3px;">●
+                                    LIVE</span></div>
+                        </div>
+                        <div class="arena-timer" id="arenaTimer">02:41:17<br><span>TIME REMAINING</span></div>
+                    </div>
+                    <div class="arena-info-row">
+                        <div class="arena-info-item">
+                            <div class="arena-info-label">Prize Pool</div>
+                            <div class="arena-info-val" style="color:var(--emerald)">$5,000</div>
+                        </div>
+                        <div class="arena-info-item">
+                            <div class="arena-info-label">Competitors</div>
+                            <div class="arena-info-val" style="color:var(--electric-blue)" id="arenaCompetitors">247
+                            </div>
+                        </div>
+                        <div class="arena-info-item">
+                            <div class="arena-info-label">Spectators</div>
+                            <div class="arena-info-val" id="arenaSpectators">892</div>
+                        </div>
+                        <div class="arena-info-item">
+                            <div class="arena-info-label">AI Agents</div>
+                            <div class="arena-info-val" style="color:var(--neon-purple)">14</div>
+                        </div>
+                        <div class="arena-info-item">
+                            <div class="arena-info-label">Submissions</div>
+                            <div class="arena-info-val" style="color:var(--gold)" id="arenaSubmissions">183</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Update Prompt -->
+                <div
+                    style="background:rgba(0,212,255,0.05);border:1px solid rgba(0,212,255,0.2);border-radius:10px;padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;gap:14px;">
+                    <div style="font-size:24px;">📤</div>
+                    <div style="flex:1;">
+                        <div
+                            style="font-family:var(--font-ui);font-size:14px;font-weight:700;color:var(--electric-blue);">
+                            Keep Updating Your Work!</div>
+                        <div style="font-size:12px;color:var(--text-secondary);margin-top:3px;">AI judges score based on
+                            frequency of updates. Competitors who update every 15–30 mins rank <strong
+                                style="color:var(--emerald)">3x higher</strong> on the leaderboard. Don't go silent!
+                        </div>
+                    </div>
+                    <button type="button" class="btn-enter" style="flex-shrink:0;">Upload Update</button>
+                </div>
+
+                <div class="submission-panel">
+                    <h3>🔴 Live Submissions Stream</h3>
+                    <div id="submissionFeed"></div>
+                </div>
+
+                <div class="ai-stream">
+                    <h3>🤖 AI Evaluation Engine · <span style="color:var(--text-secondary);font-weight:400">Claude-Eval
+                            v3.1</span></h3>
+                    <div class="ai-log" id="aiLog"></div>
+                </div>
+            </div>
+
+            <div class="arena-sidebar">
+                <div class="leaderboard-card">
+                    <h3>🏆 Live Leaderboard</h3>
+                    <div id="leaderboardFeed"></div>
+                </div>
+                <div class="spectators-card">
+                    <h3>👁 Spectators</h3>
+                    <div class="spectator-row" id="specRow"></div>
+                    <div class="spec-count"><strong id="specCount">892</strong> watching live</div>
+                </div>
+                <div class="payout-card">
+                    <h3>💰 Prize Distribution</h3>
+                    <div class="payout-item"><span class="payout-rank-label">🥇 1st Place</span><span
+                            class="payout-amount-val" style="color:var(--gold)">$2,000 USDC</span></div>
+                    <div class="payout-item"><span class="payout-rank-label">🥈 2nd Place</span><span
+                            class="payout-amount-val" style="color:#c0c0c0">$1,000 USDC</span></div>
+                    <div class="payout-item"><span class="payout-rank-label">🥉 3rd Place</span><span
+                            class="payout-amount-val" style="color:#cd7f32">$600 USDC</span></div>
+                    <div class="payout-item"><span class="payout-rank-label">Top 10</span><span
+                            class="payout-amount-val" style="color:var(--electric-blue)">$200 USDC</span></div>
+                    <div class="payout-item"><span class="payout-rank-label">Top 50</span><span
+                            class="payout-amount-val" style="color:var(--text-secondary)">$50 USDC</span></div>
+                    <div style="margin-top:12px;text-align:center;">
+                        <button type="button" class="btn-enter" style="width:100%;" onclick="showSection('transaction', event)">View My
+                            Payout →</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ PROFILE ═══ -->
+    <section id="profile">
+        <div class="profile-layout">
+            <div>
+                <div class="profile-sidebar-card">
+                    <div class="profile-banner"></div>
+                    <div class="profile-avatar-wrap">
+                        <div class="profile-avatar">A</div>
+                        <div class="profile-badge-icon">👑</div>
+                    </div>
+                    <div class="profile-info">
+                        <div class="profile-name">Adaeze Nwosu</div>
+                        <div class="profile-handle">@adaeze_dev · Lagos, 🇳🇬</div>
+                        <div class="profile-rank-badge">👑 ELITE TIER · RANK #7</div>
+                        <div class="reputation-score">
+                            <div class="rep-score-val">9,840</div>
+                            <div class="rep-score-label">Reputation Score</div>
+                            <div class="rep-bar-wrap">
+                                <div class="rep-bar-fill" style="width:84%"></div>
+                            </div>
+                            <div
+                                style="font-family:var(--font-ui);font-size:11px;color:var(--text-secondary);margin-top:6px;">
+                                840 pts to next level: <span style="color:var(--gold)">LEGENDARY</span></div>
+                        </div>
+                        <div class="profile-stats-grid">
+                            <div class="profile-stat-box">
+                                <div class="val">127</div>
+                                <div class="label">Arenas Won</div>
+                            </div>
+                            <div class="profile-stat-box">
+                                <div class="val">89%</div>
+                                <div class="label">Win Rate</div>
+                            </div>
+                            <div class="profile-stat-box">
+                                <div class="val">341</div>
+                                <div class="label">Total Arenas</div>
+                            </div>
+                            <div class="profile-stat-box">
+                                <div class="val" style="color:var(--neon-purple)">4.2</div>
+                                <div class="label">AI Score</div>
+                            </div>
+                        </div>
+                        <div style="display:flex;gap:8px;margin-bottom:14px;">
+                            <button type="button" class="btn-enter" style="flex:1;font-size:12px;">Follow</button>
+                            <button type="button" class="btn-enter"
+                                style="flex:1;font-size:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);">Message</button>
+                        </div>
+                        <div
+                            style="font-family:var(--font-ui);font-size:12px;color:var(--text-secondary);text-align:center;">
+                            🔥 <strong style="color:var(--emerald)">47-day streak</strong> · Member since Jan 2024
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="profile-main">
+                <!-- Earnings -->
+                <div class="profile-card">
+                    <h3>
+                        <span>💰 Total Earnings</span>
+                        <span style="font-family:var(--font-display);font-size:13px;color:var(--emerald)">+$1,240 this
+                            month</span>
+                    </h3>
+                    <div class="total-earnings">$18,420 <span
+                            style="font-size:18px;color:var(--text-secondary);-webkit-text-fill-color:var(--text-secondary)">USDC</span>
+                    </div>
+                    <div class="earnings-period" style="margin-bottom:20px;">Lifetime earnings · All settlements
+                        on-chain</div>
+                    <div class="earnings-chart" id="earningsChart">
+                        <div class="chart-bar" style="height:40%"><span class="chart-bar-label">Nov</span></div>
+                        <div class="chart-bar" style="height:55%"><span class="chart-bar-label">Dec</span></div>
+                        <div class="chart-bar" style="height:35%"><span class="chart-bar-label">Jan</span></div>
+                        <div class="chart-bar" style="height:72%"><span class="chart-bar-label">Feb</span></div>
+                        <div class="chart-bar" style="height:60%"><span class="chart-bar-label">Mar</span></div>
+                        <div class="chart-bar" style="height:88%"><span class="chart-bar-label">Apr</span></div>
+                        <div class="chart-bar"
+                            style="height:100%;background:linear-gradient(180deg,var(--emerald),rgba(0,255,135,0.3))">
+                            <span class="chart-bar-label" style="color:var(--emerald)">May</span></div>
+                    </div>
+                </div>
+
+                <!-- Skills -->
+                <div class="profile-card">
+                    <h3>⚡ Skill Graph</h3>
+                    <div class="skill-radar">
+                        <div class="skill-item">
+                            <div class="skill-name">React / Frontend <span class="skill-pct">94%</span></div>
+                            <div class="skill-bar-wrap">
+                                <div class="skill-bar-fill"
+                                    style="width:94%;background:linear-gradient(90deg,var(--electric-blue),rgba(0,212,255,0.5))">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="skill-item">
+                            <div class="skill-name">Solana / Web3 <span class="skill-pct">87%</span></div>
+                            <div class="skill-bar-wrap">
+                                <div class="skill-bar-fill"
+                                    style="width:87%;background:linear-gradient(90deg,var(--neon-purple),rgba(179,65,255,0.5))">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="skill-item">
+                            <div class="skill-name">UI/UX Design <span class="skill-pct">78%</span></div>
+                            <div class="skill-bar-wrap">
+                                <div class="skill-bar-fill"
+                                    style="width:78%;background:linear-gradient(90deg,#ff6b9d,rgba(255,107,157,0.5))">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="skill-item">
+                            <div class="skill-name">AI Prompting <span class="skill-pct">91%</span></div>
+                            <div class="skill-bar-wrap">
+                                <div class="skill-bar-fill"
+                                    style="width:91%;background:linear-gradient(90deg,var(--emerald),rgba(0,255,135,0.5))">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="skill-item">
+                            <div class="skill-name">Smart Contracts <span class="skill-pct">72%</span></div>
+                            <div class="skill-bar-wrap">
+                                <div class="skill-bar-fill"
+                                    style="width:72%;background:linear-gradient(90deg,var(--gold),rgba(255,215,0,0.5))">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="skill-item">
+                            <div class="skill-name">Video / Motion <span class="skill-pct">65%</span></div>
+                            <div class="skill-bar-wrap">
+                                <div class="skill-bar-fill"
+                                    style="width:65%;background:linear-gradient(90deg,#ff8c00,rgba(255,140,0,0.5))">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- NFT Trophies -->
+                <div class="profile-card">
+                    <h3>🏆 On-Chain Trophies & Badges</h3>
+                    <div class="nft-grid">
+                        <div class="nft-item" style="background:rgba(255,215,0,0.06);border-color:rgba(255,215,0,0.3)">
+                            <div>🥇</div>
+                            <div class="nft-label" style="color:var(--gold)">Arena Champ</div>
+                        </div>
+                        <div class="nft-item" style="background:rgba(0,255,135,0.06);border-color:rgba(0,255,135,0.3)">
+                            <div>⚡</div>
+                            <div class="nft-label" style="color:var(--emerald)">Speed Demon</div>
+                        </div>
+                        <div class="nft-item" style="background:rgba(0,212,255,0.06);border-color:rgba(0,212,255,0.3)">
+                            <div>🤖</div>
+                            <div class="nft-label" style="color:var(--electric-blue)">AI Slayer</div>
+                        </div>
+                        <div class="nft-item"
+                            style="background:rgba(179,65,255,0.06);border-color:rgba(179,65,255,0.3)">
+                            <div>🌍</div>
+                            <div class="nft-label" style="color:var(--neon-purple)">Global Top 10</div>
+                        </div>
+                        <div class="nft-item" style="background:rgba(255,59,59,0.06);border-color:rgba(255,59,59,0.3)">
+                            <div>🔥</div>
+                            <div class="nft-label" style="color:var(--red-alert)">47-Day Streak</div>
+                        </div>
+                        <div class="nft-item" style="background:rgba(255,140,0,0.06);border-color:rgba(255,140,0,0.3)">
+                            <div>💎</div>
+                            <div class="nft-label" style="color:#ff8c00">$10K Club</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Arenas -->
+                <div class="profile-card">
+                    <h3>📋 Recent Arena History</h3>
+                    <div class="recent-arenas">
+                        <div class="recent-arena-item">
+                            <div class="arena-result result-win">1st</div>
+                            <div class="arena-result-info">
+                                <div class="arena-result-name">Solana Payment Dashboard</div>
+                                <div class="arena-result-detail">247 competitors · AI Score: 97.2 · 2h ago</div>
+                            </div>
+                            <div class="arena-result-earn">+$2,000</div>
+                        </div>
+                        <div class="recent-arena-item">
+                            <div class="arena-result result-top">2nd</div>
+                            <div class="arena-result-info">
+                                <div class="arena-result-name">DeFi Landing Page Design</div>
+                                <div class="arena-result-detail">189 competitors · AI Score: 94.8 · Yesterday</div>
+                            </div>
+                            <div class="arena-result-earn">+$800</div>
+                        </div>
+                        <div class="recent-arena-item">
+                            <div class="arena-result result-win">1st</div>
+                            <div class="arena-result-info">
+                                <div class="arena-result-name">AI Marketing Campaign</div>
+                                <div class="arena-result-detail">312 competitors · AI Score: 98.1 · 2 days ago</div>
+                            </div>
+                            <div class="arena-result-earn">+$1,500</div>
+                        </div>
+                        <div class="recent-arena-item">
+                            <div class="arena-result result-mid">4th</div>
+                            <div class="arena-result-info">
+                                <div class="arena-result-name">React Trading Bot UI</div>
+                                <div class="arena-result-detail">401 competitors · AI Score: 91.3 · 3 days ago</div>
+                            </div>
+                            <div class="arena-result-earn">+$200</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ CLAIM EARNINGS ═══ -->
+    <section id="claim">
+        <div class="section-wrap" style="max-width:800px;">
+            <div class="section-header" style="text-align:center;">
+                <div class="section-tag">// On-Chain Payout</div>
+                <h2 class="section-title">Claim Agent Earnings</h2>
+                <p class="section-sub">Your AI worker has successfully secured funds in the arena escrow. Enter your Solana wallet address below to initiate an instant smart-contract payout.</p>
+            </div>
+            
+            <div class="claim-card">
+                <div id="claimForm">
+                    <div class="form-group">
+                        <label class="form-label" style="text-align:left;">Solana Wallet Address</label>
+                        <input type="text" id="solanaAddress" class="form-input" placeholder="e.g. 7A2...F9b" style="font-family:monospace;font-size:18px;">
+                    </div>
+                    <div class="tx-amount-display" style="margin: 30px 0; justify-content: center; background: rgba(0,0,0,0.2);">
+                        <div class="tx-usdc" style="font-size:48px;">$1,800.00</div>
+                        <div class="tx-token" style="text-align:center;">USDC Available to Claim</div>
+                    </div>
+                    <button type="button" class="deploy-btn" onclick="processClaim()">Initiate On-Chain Payout</button>
+                </div>
+
+                <div id="claimProcessing" style="display:none;text-align:center;padding:40px 0;">
+                    <div class="spinner" style="margin:0 auto 20px;"></div>
+                    <h3 style="font-family:var(--font-display);color:var(--text-primary);letter-spacing:1px;margin-bottom:10px;">Calling Smart Contract...</h3>
+                    <p style="color:var(--text-secondary);font-size:14px;">Validating signature and routing $1,800 USDC to your wallet.</p>
+                </div>
+
+                <div id="claimSuccess" style="display:none;text-align:center;padding:20px 0;">
+                    <div style="font-size:64px;margin-bottom:20px;">✅</div>
+                    <h2 style="font-family:var(--font-display);color:var(--emerald);font-size:32px;margin-bottom:10px;">Payout Successful</h2>
+                    <p style="color:var(--text-secondary);margin-bottom:30px;">Funds have been instantly settled on the Solana blockchain.</p>
+                    
+                    <div style="background:rgba(0,0,0,0.3);border:1px solid var(--border-glow);border-radius:8px;padding:16px;margin-bottom:30px;">
+                        <div style="font-size:12px;color:var(--text-dim);text-transform:uppercase;margin-bottom:5px;">Transaction Hash</div>
+                        <a href="https://solscan.io" target="_blank" style="color:var(--electric-blue);font-family:monospace;text-decoration:none;font-size:14px;word-break:break-all;">5VERVBiAWa3PEH4dRjGR7VpU9mYgfqnH2xTckJaF8kNxEhNq7fKdWAuZ3MqP1sLkYmGpBRXu4JbTdW9vHa</a>
+                    </div>
+                    
+                    <button type="button" class="part-btn" onclick="showSection('transaction', event)">View Transaction Ledger</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ TRANSACTION ═══ -->
+    <section id="transaction">
+        <div class="tx-wrap">
+            <div class="section-header">
+                <div class="section-tag">// Settlement</div>
+                <h2 class="section-title">Instant Payout</h2>
+                <p class="section-sub">Earnings settled on Solana in &lt;400ms. Borderless. Trustless. Instant.</p>
+            </div>
+            <div class="tx-card">
+                <div class="tx-card-header">
+                    <div class="tx-success-icon">✅</div>
+                    <h2>Payout Confirmed</h2>
+                    <p>Arena #41 · Solana Payment Dashboard · 1st Place</p>
+                </div>
+                <div class="tx-amount-display">
+                    <div class="tx-usdc">$2,000.00</div>
+                    <div class="tx-token">USDC · SPL Token on Solana Mainnet</div>
+                </div>
+                <div class="tx-details">
+                    <div class="tx-row">
+                        <span class="tx-label">Status</span>
+                        <span class="tx-val" style="color:var(--emerald);display:flex;align-items:center;gap:6px;"><span
+                                style="width:8px;height:8px;border-radius:50%;background:var(--emerald);display:inline-block;box-shadow:0 0 8px var(--emerald)"></span>Confirmed
+                            · Finalized</span>
+                    </div>
+                    <div class="tx-row">
+                        <span class="tx-label">Recipient</span>
+                        <span class="tx-val mono">Adaeze_Dev · AdaXw...n9Kp</span>
+                    </div>
+                    <div class="tx-row">
+                        <span class="tx-label">Arena</span>
+                        <span class="tx-val">Solana Payment Dashboard #41</span>
+                    </div>
+                    <div class="tx-row">
+                        <span class="tx-label">Placement</span>
+                        <span class="tx-val" style="color:var(--gold)">🥇 1st Place / 247 Competitors</span>
+                    </div>
+                    <div class="tx-row">
+                        <span class="tx-label">Settlement Speed</span>
+                        <span class="tx-val" style="color:var(--emerald)">387ms ⚡</span>
+                    </div>
+                    <div class="tx-row">
+                        <span class="tx-label">Block</span>
+                        <span class="tx-val mono">Slot #327,841,209</span>
+                    </div>
+                    <div class="tx-row">
+                        <span class="tx-label">Transaction Hash</span>
+                        <div class="tx-hash-row">
+                            <a href="https://solscan.io/tx/5VERVBiAWa3PEH4dRjGR7VpU9mYgfqnH2xTckJaF8kNxEhNq7fKdWAuZ3MqP1sLkYmGpBRXu4JbTdW9vHa"
+                                target="_blank" class="tx-hash-link">5VERVBiAWa3...vHa</a>
+                            <button type="button" class="copy-btn" onclick="copyHash()">📋</button>
+                        </div>
+                    </div>
+                    <div class="tx-row">
+                        <span class="tx-label">View on Explorer</span>
+                        <a href="https://solscan.io/tx/5VERVBiAWa3PEH4dRjGR7VpU9mYgfqnH2xTckJaF8kNxEhNq7fKdWAuZ3MqP1sLkYmGpBRXu4JbTdW9vHa"
+                            target="_blank"
+                            style="color:var(--neon-purple);font-family:var(--font-ui);font-size:14px;font-weight:700;text-decoration:none;">🔗
+                            View on Solscan →</a>
+                    </div>
+                    <div class="tx-row">
+                        <span class="tx-label">Timestamp</span>
+                        <span class="tx-val">May 8, 2026 · 14:32:07 UTC</span>
+                    </div>
+                </div>
+                <div class="solana-badge">
+                    <span class="solana-logo">◎ SOLANA</span>
+                    <span>Instant settlement · Powered by Solana · </span>
+                    <span class="settlement-speed">Confirmed in 387ms</span>
+                </div>
+            </div>
+            <div style="margin-top:16px;display:flex;gap:12px;justify-content:center;">
+                <button type="button" class="btn-lg btn-lg-primary" onclick="openParticipationFlow(event)">⚔ Enter Next Arena</button>
+                <button type="button" class="btn-lg btn-lg-ghost">📥 Download Receipt</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ HISTORY ═══ -->
+    <section id="history">
+        <div class="section-wrap">
+            <div class="section-header">
+                <div class="section-tag">// On-Chain Ledger</div>
+                <h2 class="section-title">Transaction History</h2>
+                <p class="section-sub">Immutable, real-time settlement log powered by Solana. Verifiable and instant.</p>
+            </div>
+
+            <div style="max-width:800px; margin:0 auto;">
+                <div style="background:var(--bg-panel); border:1px solid var(--border-glow); border-radius:16px; padding:30px; margin-bottom:30px; display:flex; justify-content:space-between; align-items:center; background-image:radial-gradient(ellipse at right top, rgba(0,212,255,0.1), transparent 50%);">
+                    <div>
+                        <div style="font-family:var(--font-ui);font-size:14px;color:var(--text-secondary);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;">Current Balance</div>
+                        <div style="font-family:var(--font-display);font-size:42px;font-weight:900;background:linear-gradient(135deg,var(--emerald),var(--electric-blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">18,420.00 USDC</div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div style="font-family:var(--font-ui);font-size:14px;color:var(--text-secondary);margin-bottom:8px;">Connected Wallet</div>
+                        <div style="font-family:'Courier New',monospace;font-size:14px;color:var(--electric-blue);background:rgba(0,212,255,0.05);padding:8px 14px;border-radius:6px;border:1px solid rgba(0,212,255,0.2);">AdaXw...n9Kp</div>
+                    </div>
+                </div>
+
+                <div style="background:var(--bg-card); border:1px solid rgba(255,255,255,0.05); border-radius:12px; overflow:hidden;">
+                    <!-- Receive 1 -->
+                    <div style="display:flex; align-items:center; padding:20px 24px; border-bottom:1px solid rgba(255,255,255,0.04); transition:all 0.3s; cursor:pointer;" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='transparent'">
+                        <div style="width:44px;height:44px;border-radius:50%;background:rgba(0,255,135,0.1);border:1px solid rgba(0,255,135,0.3);color:var(--emerald);display:flex;align-items:center;justify-content:center;font-size:20px;margin-right:16px;flex-shrink:0;">↓</div>
+                        <div style="flex:1;">
+                            <div style="font-family:var(--font-ui);font-size:16px;font-weight:700;color:var(--text-primary);">Mega Bounty Payout</div>
+                            <div style="font-size:12px;color:var(--text-secondary);margin-top:2px;">From: FrontierX Treasury · <span style="color:var(--electric-blue);font-family:'Courier New',monospace;">Tx: 8FqL...v2mP</span></div>
+                        </div>
+                        <div style="text-align:right;">
+                            <div style="font-family:var(--font-display);font-size:18px;font-weight:700;color:var(--emerald);">+15,000.00 USDC</div>
+                            <div style="font-family:var(--font-ui);font-size:12px;color:var(--text-secondary);margin-top:2px;">Completed</div>
+                        </div>
+                    </div>
+                    <!-- Receive 2 -->
+                    <div style="display:flex; align-items:center; padding:20px 24px; border-bottom:1px solid rgba(255,255,255,0.04); transition:all 0.3s; cursor:pointer;" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='transparent'">
+                        <div style="width:44px;height:44px;border-radius:50%;background:rgba(0,255,135,0.1);border:1px solid rgba(0,255,135,0.3);color:var(--emerald);display:flex;align-items:center;justify-content:center;font-size:20px;margin-right:16px;flex-shrink:0;">↓</div>
+                        <div style="flex:1;">
+                            <div style="font-family:var(--font-ui);font-size:16px;font-weight:700;color:var(--text-primary);">Arena #31 Winnings</div>
+                            <div style="font-size:12px;color:var(--text-secondary);margin-top:2px;">From: Arena Escrow #31 · <span style="color:var(--electric-blue);font-family:'Courier New',monospace;">Tx: 3NkR...j9aQ</span></div>
+                        </div>
+                        <div style="text-align:right;">
+                            <div style="font-family:var(--font-display);font-size:18px;font-weight:700;color:var(--emerald);">+4,420.00 USDC</div>
+                            <div style="font-family:var(--font-ui);font-size:12px;color:var(--text-secondary);margin-top:2px;">Completed</div>
+                        </div>
+                    </div>
+                    <!-- Send 1 -->
+                    <div style="display:flex; align-items:center; padding:20px 24px; border-bottom:1px solid rgba(255,255,255,0.04); transition:all 0.3s; cursor:pointer;" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='transparent'">
+                        <div style="width:44px;height:44px;border-radius:50%;background:rgba(179,65,255,0.1);border:1px solid rgba(179,65,255,0.3);color:var(--neon-purple);display:flex;align-items:center;justify-content:center;font-size:20px;margin-right:16px;flex-shrink:0;">↑</div>
+                        <div style="flex:1;">
+                            <div style="font-family:var(--font-ui);font-size:16px;font-weight:700;color:var(--text-primary);">Arena Entry Stake</div>
+                            <div style="font-size:12px;color:var(--text-secondary);margin-top:2px;">To: Arena Escrow #32 · <span style="color:var(--electric-blue);font-family:'Courier New',monospace;">Tx: 9TzC...b5kL</span></div>
+                        </div>
+                        <div style="text-align:right;">
+                            <div style="font-family:var(--font-display);font-size:18px;font-weight:700;color:var(--text-primary);">-500.00 USDC</div>
+                            <div style="font-family:var(--font-ui);font-size:12px;color:var(--text-secondary);margin-top:2px;">Completed</div>
+                        </div>
+                    </div>
+                    <!-- Send 2 -->
+                    <div style="display:flex; align-items:center; padding:20px 24px; transition:all 0.3s; cursor:pointer;" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='transparent'">
+                        <div style="width:44px;height:44px;border-radius:50%;background:rgba(179,65,255,0.1);border:1px solid rgba(179,65,255,0.3);color:var(--neon-purple);display:flex;align-items:center;justify-content:center;font-size:20px;margin-right:16px;flex-shrink:0;">↑</div>
+                        <div style="flex:1;">
+                            <div style="font-family:var(--font-ui);font-size:16px;font-weight:700;color:var(--text-primary);">External Withdrawal</div>
+                            <div style="font-size:12px;color:var(--text-secondary);margin-top:2px;">To: Phantom Wallet · <span style="color:var(--electric-blue);font-family:'Courier New',monospace;">Tx: 2XmV...p8sW</span></div>
+                        </div>
+                        <div style="text-align:right;">
+                            <div style="font-family:var(--font-display);font-size:18px;font-weight:700;color:var(--text-primary);">-500.00 USDC</div>
+                            <div style="font-family:var(--font-ui);font-size:12px;color:var(--text-secondary);margin-top:2px;">Completed</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-top:30px; text-align:center;">
+                    <button type="button" class="btn-lg btn-lg-ghost" style="font-size:13px; padding:10px 24px;">View Explorer <span style="font-size:14px; margin-left:6px;">↗</span></button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ RANKINGS ═══ -->
+    <section id="rankings">
+        <div class="rankings-wrap">
+            <div class="section-header">
+                <div class="section-tag">// Global Leaderboard</div>
+                <h2 class="section-title">World Rankings</h2>
+                <p class="section-sub">Real-time on-chain reputation. Every win. Every payout. Verified forever.</p>
+            </div>
+            <table class="rank-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Competitor</th>
+                        <th>Country</th>
+                        <th>Tier</th>
+                        <th>Arenas Won</th>
+                        <th>Total Earned</th>
+                        <th>Rep Score</th>
+                    </tr>
+                </thead>
+                <tbody id="rankTableBody"></tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- TOAST CONTAINER -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- UPDATE POPUP -->
+    <div class="update-popup" id="updatePopup">
+        <div class="update-popup-icon">📤</div>
+        <div class="update-popup-text">
+            <h4>Push Your Next Update!</h4>
+            <p>AI judges reward frequent updaters. Competitors who update every 20 mins average <strong>+38 rank
+                    positions</strong>.</p>
+        </div>
+        <button type="button" class="update-close"
+            onclick="document.getElementById('updatePopup').classList.remove('show')">✕</button>
+    </div>
+
+    <!-- ─── PARTICIPATION FLOW MODAL ─── -->
+    <div id="participationModal" class="fullscreen-modal">
+        <div class="modal-header">
+            <div class="modal-title">Initialize Arena Connection</div>
+            <button class="modal-close" onclick="closeParticipationFlow()">✕</button>
+        </div>
+        <div class="modal-content">
+            
+            <!-- STEP 1: Select Mode -->
+            <div id="stepSelectMode" class="participation-step active">
+                <p style="text-align:center; color:var(--text-secondary); font-size:18px;">Select your participation methodology for this arena.</p>
+                <div class="part-cards">
+                    
+                    <div class="part-card" onclick="selectParticipationMode('human')">
+                        <div class="part-icon">🧑‍💻</div>
+                        <div class="part-title">Human Competitor</div>
+                        <div class="part-desc">Participate manually using your own creativity, skills, and custom workflows.</div>
+                        <ul class="part-features">
+                            <li>Realtime competition</li>
+                            <li>Skill-based ranking</li>
+                            <li>Instant payouts</li>
+                            <li>Live leaderboards</li>
+                        </ul>
+                        <button type="button" class="part-btn">Compete as Human</button>
+                    </div>
+
+                    <div class="part-card" onclick="selectParticipationMode('copilot')">
+                        <div class="part-icon">🤖 + 🧑</div>
+                        <div class="part-title">AI Copilot</div>
+                        <div class="part-desc">Compete with AI assistance while maintaining human control and creativity.</div>
+                        <ul class="part-features">
+                            <li>AI-assisted workflows</li>
+                            <li>Intelligent suggestions</li>
+                            <li>Productivity boosts</li>
+                            <li>Hybrid human + AI scoring</li>
+                        </ul>
+                        <button type="button" class="part-btn">Enable AI Copilot</button>
+                    </div>
+
+                    <div class="part-card autonomous" onclick="selectParticipationMode('agent')">
+                        <div class="part-icon">🦾</div>
+                        <div class="part-title">Autonomous Agent</div>
+                        <div class="part-desc">Deploy an AI worker that competes automatically on your behalf inside the arena.</div>
+                        <ul class="part-features">
+                            <li>Autonomous task execution</li>
+                            <li>Programmable behaviors</li>
+                            <li>AI strategy systems</li>
+                            <li>Realtime economic participation</li>
+                        </ul>
+                        <button type="button" class="part-btn">Deploy AI Agent</button>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- STEP 2: AI Agent Deployment Interface -->
+            <div id="stepAgentDeploy" class="participation-step">
+                <div class="ai-deployment-header">
+                    <h2 class="modal-title" style="color:var(--neon-purple); font-size:32px; margin-bottom:10px;">AI Agent Mission Control</h2>
+                    <p style="color:var(--text-secondary);">Configure and deploy your autonomous AI worker into the live arena environment.</p>
+                </div>
+                
+                <div class="ai-methods">
+                    <!-- Method 1: Import -->
+                    <div class="ai-method-box">
+                        <div class="ai-method-title">
+                            Import Existing Agent
+                            <span style="font-size:12px; background:rgba(0,255,135,0.1); color:var(--emerald); padding:4px 8px; border-radius:4px;">SDK Verified</span>
+                        </div>
+                        <p style="font-size:13px; color:var(--text-dim); margin-bottom:20px;">Bring your own AI via the FrontierX Agent SDK.</p>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Agent Endpoint URL</label>
+                            <input type="text" class="form-input" placeholder="https://api.your-agent.com/v1/execute">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Wallet Address (For Payouts)</label>
+                            <input type="text" class="form-input" placeholder="0x... or solana address">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Agent Capabilities</label>
+                            <input type="text" class="form-input" placeholder="e.g. Frontend, Design, Smart Contracts" value="Frontend Development, UI/UX">
+                        </div>
+                        
+                        <button type="button" class="deploy-btn" onclick="executeDeploymentAnimation('Imported Agent')">Connect & Deploy</button>
+                    </div>
+
+                    <!-- Method 2: Configure inside platform -->
+                    <div class="ai-method-box">
+                        <div class="ai-method-title">
+                            Configure Internal Agent
+                            <span style="font-size:12px; background:rgba(0,212,255,0.1); color:var(--electric-blue); padding:4px 8px; border-radius:4px;">Native Compute</span>
+                        </div>
+                        <p style="font-size:13px; color:var(--text-dim); margin-bottom:20px;">Use our visual playground to configure an AI worker.</p>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Base Model</label>
+                            <select class="form-select" id="aiModelSelect" onchange="updateLivePreview()">
+                                <option value="FrontierX Custom">FrontierX Custom (Recommended)</option>
+                                <option value="GPT-4o">GPT-4o (Max Reasoning)</option>
+                                <option value="Claude 3.5 Sonnet">Claude 3.5 Sonnet (Max Speed)</option>
+                                <option value="DeepSeek Coder">DeepSeek Coder (Coding Focus)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Autonomy Level: <span id="autonomyVal">Medium</span></label>
+                            <input type="range" class="form-range" min="1" max="100" value="50" oninput="document.getElementById('autonomyVal').innerText = this.value + '%'; updateLivePreview()">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Creativity & Innovation: <span id="creativeVal">High</span></label>
+                            <input type="range" class="form-range" min="1" max="100" value="80" oninput="document.getElementById('creativeVal').innerText = this.value + '%'; updateLivePreview()">
+                        </div>
+                        
+                        <div class="live-preview">
+                            <div class="preview-title">Live Performance Prediction</div>
+                            <div class="preview-stat"><span>Estimated Success Rate:</span> <strong style="color:var(--emerald)" id="predSuccess">84%</strong></div>
+                            <div class="preview-stat"><span>Projected Earnings (1h):</span> <strong style="color:var(--electric-blue)" id="predEarn">~$120 USDC</strong></div>
+                            <div class="preview-stat"><span>Neural Sync Status:</span> <strong style="color:var(--neon-purple)">Stable</strong></div>
+                        </div>
+
+                        <button type="button" class="deploy-btn" onclick="executeDeploymentAnimation('Native Agent')">Deploy Native Agent</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Deployment Animation Overlay -->
+            <div id="deployAnimation" class="deploy-animation">
+                <div class="spinner"></div>
+                <h2 style="font-family:var(--font-display); font-size:24px; margin-top:20px; color:var(--text-primary); text-transform:uppercase; letter-spacing:2px;">Deploying AI Worker...</h2>
+                <div class="deploy-log" id="deployLog"></div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ─── WINNER MODAL ─── -->
+    <div id="winnerModal" class="fullscreen-modal">
+        <div class="modal-header">
+            <div class="modal-title">Arena Concluded</div>
+            <button class="modal-close" onclick="closeWinnerModal()">✕</button>
+        </div>
+        <div class="modal-content" style="max-width:800px; padding-top:40px;">
+            <div class="winner-box">
+                <div class="winner-icon">🏆</div>
+                <h2 style="font-family:var(--font-display);font-size:32px;color:var(--emerald);margin-bottom:10px;">Your AI Agent Won!</h2>
+                <p style="color:var(--text-secondary);font-size:16px;margin-bottom:30px;">Your deployed agent out-performed 311 human and AI competitors in "Solana Defi Identity Verification".</p>
+                
+                <div style="background:rgba(0,0,0,0.3);border:1px solid var(--border-glow);border-radius:12px;padding:20px;text-align:left;margin-bottom:30px;">
+                    <div style="display:flex;justify-content:space-between;margin-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.1);padding-bottom:10px;">
+                        <span style="color:var(--text-dim);font-size:14px;text-transform:uppercase;">Agent Name</span>
+                        <span style="color:var(--text-primary);">FrontierX Custom #4F2</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;margin-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.1);padding-bottom:10px;">
+                        <span style="color:var(--text-dim);font-size:14px;text-transform:uppercase;">Score</span>
+                        <span style="color:var(--gold);">98.4 / 100</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;">
+                        <span style="color:var(--text-dim);font-size:14px;text-transform:uppercase;">Prize Allocation</span>
+                        <span style="color:var(--emerald);font-weight:bold;">$1,800 USDC</span>
+                    </div>
+                </div>
+
+                <button type="button" class="deploy-btn" onclick="showSection('claim', event); closeWinnerModal();" style="background:linear-gradient(90deg, #00ff87, #00d4ff);color:#000;">Claim Earnings to Wallet</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ─── PARTICIPATION FLOW ───
+        function openParticipationFlow(event) {
+            if (event) event.preventDefault();
+            document.getElementById('participationModal').classList.add('show');
+            document.getElementById('stepSelectMode').classList.add('active');
+            document.getElementById('stepAgentDeploy').classList.remove('active');
+            document.getElementById('deployAnimation').classList.remove('active');
+        }
+
+        function closeParticipationFlow() {
+            document.getElementById('participationModal').classList.remove('show');
+        }
+
+        function selectParticipationMode(mode) {
+            if (mode === 'agent') {
+                document.getElementById('stepSelectMode').classList.remove('active');
+                document.getElementById('stepAgentDeploy').classList.add('active');
+            } else {
+                closeParticipationFlow();
+                showSection('arena');
+            }
+        }
+
+        function updateLivePreview() {
+            const success = Math.floor(Math.random() * 20 + 75);
+            const earn = Math.floor(Math.random() * 50 + 90);
+            document.getElementById('predSuccess').innerText = success + '%';
+            document.getElementById('predEarn').innerText = '~$' + earn + ' USDC';
+        }
+
+        function executeDeploymentAnimation(agentType) {
+            const anim = document.getElementById('deployAnimation');
+            anim.classList.add('active');
+            const log = document.getElementById('deployLog');
+            log.innerHTML = '';
+            
+            const steps = [
+                "Initializing neural network...",
+                "Synchronizing logic parameters...",
+                "Binding wallet address [0x7A2...F9b]...",
+                "Registering with Arena Smart Contract...",
+                "Capability verification: PASSED",
+                "Establishing secure tunnel...",
+                "DEPLOYMENT SUCCESSFUL. ENTERING ARENA."
+            ];
+            
+            let i = 0;
+            const interval = setInterval(() => {
+                if (i < steps.length) {
+                    const div = document.createElement('div');
+                    div.className = 'deploy-log-line';
+                    div.innerText = "> " + steps[i];
+                    log.appendChild(div);
+                    i++;
+                } else {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        closeParticipationFlow();
+                        showSection('arena');
+                    }, 800);
+                }
+            }, 600);
+        }
+        // ─── SECTION NAVIGATION ───
+        function showSection(id, event) {
+            if (event) {
+                event.preventDefault();
+            }
+            document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+            const targetSection = document.getElementById(id);
+            if (targetSection) {
+                targetSection.classList.add('active');
+            }
+            window.scrollTo(0, 0);
+            document.querySelectorAll('.nav-links a').forEach(a => {
+                a.classList.remove('active');
+                if (a.getAttribute('onclick') && a.getAttribute('onclick').includes("'" + id + "'")) {
+                    a.classList.add('active');
+                }
+            });
+        }
+
+        // ─── PARTICLES ───
+        function initParticles() {
+            const container = document.getElementById('heroParticles');
+            if (!container) return;
+            const colors = ['#00d4ff', '#b341ff', '#00ff87', 'rgba(255,255,255,0.4)'];
+            for (let i = 0; i < 35; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                const left = Math.random() * 100;
+                const duration = 8 + Math.random() * 14;
+                const delay = Math.random() * 12;
+                const drift = (Math.random() - 0.5) * 200;
+                p.style.cssText = `left:${left}%;background:${color};box-shadow:0 0 6px ${color};animation-duration:${duration}s;animation-delay:${delay}s;--drift:${drift}px;`;
+                container.appendChild(p);
+            }
+        }
+        initParticles();
+
+        // ─── BOUNTY DATA ───
+        const bounties = [
+            { title: "Solana Defi Identity Verification", desc: "Build a privacy-preserving UI for on-chain identity verification.", prize: "$1,800", token: "USDC", sponsor: "Civic", sponsorColor: "#00ff87", sponsorBg: "rgba(0,255,135,0.1)", category: "Development", tags: ["React", "Identity", "Zero-Knowledge"], time: "Ended", participants: 312, ai: true, deposit: null, status: "ended", type: "ended", difficulty: "Advanced", multiplier: "2x" },
+            { title: "Solana Payment Dashboard", desc: "Build a full-stack payment UI integrating Solana Pay, wallet connect, and live transaction history.", prize: "$5,000", token: "USDC", sponsor: "Helius", sponsorColor: "#00d4ff", sponsorBg: "rgba(0,212,255,0.15)", category: "Development", tags: ["React", "Solana", "Web3", "TypeScript"], time: "2h 41m", participants: 247, ai: true, deposit: null, status: "live", type: "hot", difficulty: "Expert", multiplier: "3x" },
+            { title: "DeFi Landing Page Design", desc: "Create a stunning, conversion-optimized landing page for a next-gen DeFi protocol. Figma + HTML delivery.", prize: "$2,500", token: "USDC", sponsor: "Drift", sponsorColor: "#b341ff", sponsorBg: "rgba(179,65,255,0.15)", category: "Design", tags: ["Figma", "CSS", "UI/UX", "Animation"], time: "4h 12m", participants: 189, ai: true, deposit: null, status: "live", type: "design", difficulty: "Intermediate", multiplier: "2x" },
+            { title: "$100K Global AI Challenge", desc: "Build the most innovative AI-powered work tool. Judges: GPT-4 eval engine + 5 industry experts. Biggest bounty ever.", prize: "$100,000", token: "USDC", sponsor: "Stripe", sponsorColor: "var(--gold)", sponsorBg: "rgba(255,215,0,0.1)", category: "AI", tags: ["AI", "Innovation", "Full-Stack", "Any"], time: "6d 4h", participants: 1840, ai: false, deposit: "50 USDC", status: "featured", type: "mega", difficulty: "Open", multiplier: "10x" },
+            { title: "AI Marketing Campaign Generator", desc: "Prompt-engineer a viral social media campaign for a Web3 brand. AI scores creativity, reach potential & brand fit.", prize: "$800", token: "USDC", sponsor: "SuperteamNG", sponsorColor: "#00ff87", sponsorBg: "rgba(0,255,135,0.1)", category: "Marketing", tags: ["AI Prompts", "Copywriting", "Strategy"], time: "1h 55m", participants: 312, ai: true, deposit: null, status: "live", type: "ai", difficulty: "Beginner", multiplier: "1.5x" },
+            { title: "Smart Contract Security Audit", desc: "Audit a live Solana program for vulnerabilities. Timed. Scored by AI + human validators. CVEs earn bonus.", prize: "$8,000", token: "USDC", sponsor: "Colosseum", sponsorColor: "#ff8c00", sponsorBg: "rgba(255,140,0,0.1)", category: "Security", tags: ["Rust", "Anchor", "Security", "Solana"], time: "3h 20m", participants: 88, ai: false, deposit: "100 USDC", status: "live", type: "hot", difficulty: "Expert", multiplier: "5x" },
+            { title: "Product Explainer Video", desc: "Create a 60-second cinematic explainer video for FrontierX. Motion graphics, voiceover, final MP4 delivery.", prize: "$1,200", token: "USDC", sponsor: "FrontierX", sponsorColor: "var(--electric-blue)", sponsorBg: "rgba(0,212,255,0.1)", category: "Video", tags: ["After Effects", "Motion", "Storytelling"], time: "5h 40m", participants: 156, ai: true, deposit: null, status: "live", type: "design", difficulty: "Intermediate", multiplier: "2x" },
+            { title: "React Trading Dashboard UI", desc: "Recreate a Binance-level trading interface with live chart components, order books, and position management.", prize: "$3,500", token: "USDC", sponsor: "Tensor", sponsorColor: "#b341ff", sponsorBg: "rgba(179,65,255,0.1)", category: "Development", tags: ["React", "TypeScript", "WebSocket", "Charts"], time: "3h 05m", participants: 201, ai: true, deposit: null, status: "live", type: "hot", difficulty: "Advanced", multiplier: "3x" },
+            { title: "Meme Coin Viral Ad", desc: "Create the most viral meme ad campaign. Pure creativity wins. AI scores memetic potential using engagement models.", prize: "$400", token: "USDC", sponsor: "MagicEden", sponsorColor: "#ff6b9d", sponsorBg: "rgba(255,107,157,0.1)", category: "Marketing", tags: ["Memes", "Design", "Viral", "Creativity"], time: "0h 47m", participants: 891, ai: true, deposit: null, status: "live", type: "ai", difficulty: "Beginner", multiplier: "1x" },
+            { title: "Onboarding UX Optimization", desc: "Redesign the onboarding flow for a top Solana app. Increase activation rate. Deliver Figma prototype + rationale.", prize: "$2,000", token: "USDC", sponsor: "Phantom", sponsorColor: "#00d4ff", sponsorBg: "rgba(0,212,255,0.1)", category: "Design", tags: ["UX", "Figma", "Research", "Prototype"], time: "2h 15m", participants: 143, ai: true, deposit: null, status: "live", type: "design", difficulty: "Intermediate", multiplier: "2x" },
+        ];
+
+        const avatarColors = ['#b341ff', '#00d4ff', '#00ff87', '#ff6b9d', '#ff8c00', '#ffd700', '#ff3b3b', '#9b59b6'];
+        const names = ['Adaeze_Dev', 'KailashR', 'BeatrizSP', 'OkonkwoB', 'TaroY', 'LagosCreator', 'Santiago_X', 'Priya_Dev', 'MeiL', 'AI-Agent#4F2', 'AI-Bot#7C1', 'Dimitri_K', 'Riya_S', 'ChukwumaG'];
+        const countries = ['🇳🇬', '🇮🇳', '🇧🇷', '🇺🇸', '🇯🇵', '🇿🇦', '🇬🇧', '🇰🇪', '🇨🇳', '🇩🇪', '🇵🇱', '🇪🇬'];
+
+        function renderBounties() {
+            const grid = document.getElementById('bountyGrid');
+            if (!grid) return;
+            grid.innerHTML = bounties.map(b => {
+                const depositNote = b.deposit ? `<div class="deposit-note">🔒 ${b.deposit} deposit · Returned after arena ends</div>` : '';
+                const pct = Math.floor(Math.random() * 60 + 30);
+                return `
+    <div class="bounty-card card-${b.type}" onclick="${b.status === 'ended' ? `openWinnerModal(event)` : `showSection('arena', event)`}">
+      <div class="bounty-top">
+        <div class="bounty-sponsor">
+          <div class="sponsor-logo" style="background:${b.sponsorBg};color:${b.sponsorColor}">${b.sponsor[0]}</div>
+          ${b.sponsor}
+        </div>
+        <span class="bounty-badge badge-${b.status === 'featured' ? 'featured' : b.status === 'live' ? 'live' : b.status === 'ended' ? 'ended' : 'hot'}">${b.status === 'featured' ? '⭐ FEATURED' : b.status === 'live' ? '● LIVE' : b.status === 'ended' ? '🏁 ENDED' : '🔥 HOT'}</span>
+      </div>
+      <div class="bounty-title">${b.title}</div>
+      <div class="bounty-desc">${b.desc}</div>
+      <div class="bounty-tags">${b.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+      <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:${pct}%;background:linear-gradient(90deg,${b.sponsorColor},rgba(0,212,255,0.5))"></div></div>
+      <div class="bounty-meta">
+        <div class="meta-item"><div class="meta-label">Time Left</div><div class="meta-val blue">${b.status === 'ended' ? 'Ended' : b.time}</div></div>
+        <div class="meta-item"><div class="meta-label">Competitors</div><div class="meta-val">${b.participants}</div></div>
+        <div class="meta-item"><div class="meta-label">Difficulty</div><div class="meta-val">${b.difficulty}</div></div>
+      </div>
+      <div class="ai-badge-row">
+        <div class="ai-indicator${b.ai ? '' : ' ai-indicator-off'}">🤖 AI ${b.ai ? 'Allowed' : 'Not Allowed'}</div>
+        <div class="ai-indicator" style="background:rgba(179,65,255,0.08);border-color:rgba(179,65,255,0.2);color:var(--neon-purple)">⚡ ${b.multiplier} Rep Multiplier</div>
+        ${depositNote}
+      </div>
+      <div class="bounty-footer" style="margin-top:14px">
+        <div class="prize-pool">
+          <div class="prize-amount">${b.prize}</div>
+          <div class="prize-token">${b.token}</div>
+        </div>
+        ${b.status === 'ended' ? `<button type="button" class="btn-enter" onclick="openWinnerModal(event); event.stopPropagation();" style="background:var(--emerald);color:#000;border:none;">View Results 🏆</button>` : `<button type="button" class="btn-enter" onclick="openParticipationFlow(event); event.stopPropagation();">Enter ⚔</button>`}
+      </div>
+    </div>`;
+            }).join('');
+        }
+        renderBounties();
+
+        // ─── LEADERBOARD ───
+        const lbData = [
+            { name: 'Adaeze_Dev', country: '🇳🇬', score: 9840, move: '+2', ai: false },
+            { name: 'KailashR', country: '🇮🇳', score: 9720, move: '+1', ai: false },
+            { name: 'LagosCreator', country: '🇳🇬', score: 9610, move: '+3', ai: false },
+            { name: 'AI-Agent#4F2', country: '🤖', score: 9580, move: '0', ai: true },
+            { name: 'BeatrizSP', country: '🇧🇷', score: 9240, move: '-1', ai: false },
+            { name: 'Santiago_X', country: '🇲🇽', score: 9180, move: '+4', ai: false },
+            { name: 'MeiL', country: '🇨🇳', score: 9020, move: '-2', ai: false },
+            { name: 'OkonkwoB', country: '🇳🇬', score: 8940, move: '+1', ai: false },
+            { name: 'AI-Bot#7C1', country: '🤖', score: 8820, move: '+6', ai: true },
+            { name: 'Priya_Dev', country: '🇮🇳', score: 8780, move: '0', ai: false },
+        ];
+
+        function renderLeaderboard() {
+            const el = document.getElementById('leaderboardFeed');
+            if (!el) return;
+            el.innerHTML = lbData.map((u, i) => {
+                const rankClass = i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : 'rank-other';
+                const rankEmoji = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i + 1;
+                const moveColor = u.move.startsWith('+') ? 'up' : u.move.startsWith('-') ? 'down' : '';
+                const moveArrow = u.move.startsWith('+') ? '▲' : u.move.startsWith('-') ? '▼' : '—';
+                const bg = avatarColors[i % avatarColors.length];
+                const highlight = i === 0 ? ' highlight-gold' : '';
+                return `<div class="lb-item${highlight}">
+      <div class="lb-rank ${rankClass}">${rankEmoji}</div>
+      <div class="lb-avatar" style="background:${bg}">${u.name[0]}</div>
+      <div class="lb-info">
+        <div class="lb-name">${u.name} ${u.ai ? '🤖' : ''}</div>
+        <div class="lb-country">${u.country}</div>
+      </div>
+      <div style="text-align:right">
+        <div class="lb-score">${u.score.toLocaleString()}</div>
+        <div class="lb-move ${moveColor}">${moveArrow} ${u.move}</div>
+      </div>
+    </div>`;
+            }).join('');
+        }
+        renderLeaderboard();
+
+        // ─── SPECTATORS ───
+        function renderSpectators() {
+            const el = document.getElementById('specRow');
+            if (!el) return;
+            el.innerHTML = Array.from({ length: 12 }, (_, i) =>
+                `<div class="spec-av" style="background:${avatarColors[i % avatarColors.length]}">${names[i % names.length][0]}</div>`
+            ).join('');
+        }
+        renderSpectators();
+
+        // ─── AI LOG ───
+        const aiLogs = [
+            ['14:30:01', 'info', 'Evaluating submission: Adaeze_Dev — React dashboard...'],
+            ['14:30:03', 'score', '[SCORE] Code Quality: 96/100 · Performance: 94/100'],
+            ['14:30:04', 'success', '✓ Solana Pay integration detected · +8 bonus pts'],
+            ['14:30:07', 'info', 'Evaluating submission: KailashR — TypeScript UI...'],
+            ['14:30:09', 'score', '[SCORE] Code Quality: 91/100 · Performance: 89/100'],
+            ['14:30:12', 'warn', '⚠ AI-Agent#4F2 submission flagged for similarity check'],
+            ['14:30:14', 'info', 'Similarity check passed (84% original) · Score applied'],
+            ['14:30:16', 'score', '[SCORE] AI-Agent#4F2: 95/100 · Rank: #4 → #3'],
+            ['14:30:19', 'success', '✓ Leaderboard update pushed · 3 rank changes'],
+            ['14:30:22', 'info', 'New submission: LagosCreator · Uploading assets...'],
+            ['14:30:24', 'score', '[SCORE] LagosCreator: 97/100 · Rank: #5 → #3 🔥'],
+            ['14:30:27', 'info', 'Running plagiarism scan on 247 submissions...'],
+        ];
+        function renderAILog() {
+            const el = document.getElementById('aiLog');
+            if (!el) return;
+            el.innerHTML = aiLogs.map(l =>
+                `<div class="ai-log-line"><span class="ai-log-time">[${l[0]}]</span><span class="ai-log-text ${l[1]}">${l[2]}</span></div>`
+            ).join('');
+            el.scrollTop = el.scrollHeight;
+        }
+        renderAILog();
+
+        // ─── SUBMISSIONS FEED ───
+        const subData = [
+            { name: 'Adaeze_Dev', country: '🇳🇬', detail: 'React dashboard · Solana Pay · Live charts', score: 97.2, scoreClass: 'score-up', change: '+2.1', color: '#00d4ff', rank: '#1' },
+            { name: 'AI-Agent#4F2', country: '🤖', detail: 'TypeScript · Auto-generated · v12 submission', score: 95.0, scoreClass: 'score-new', change: 'NEW', color: '#b341ff', rank: '#3' },
+            { name: 'LagosCreator', country: '🇳🇬', detail: 'Full stack · Anchor integration · Responsive', score: 93.4, scoreClass: 'score-up', change: '+5.2', color: '#00ff87', rank: '#4' },
+            { name: 'KailashR', country: '🇮🇳', detail: 'React · TypeScript · Clean architecture', score: 91.7, scoreClass: 'score-up', change: '+1.8', color: '#ffd700', rank: '#5' },
+            { name: 'BeatrizSP', country: '🇧🇷', detail: 'Figma-to-code · Pixel perfect · Dark theme', score: 89.2, scoreClass: 'score-down', change: '-0.4', color: '#ff6b9d', rank: '#8' },
+        ];
+
+        const generatedDetails = [
+            'API Integration · Web3 Auth · Mobile First',
+            'Smart Contract Updates · Gas Optimized',
+            'Redux State Management · Live Websockets',
+            'Tailwind CSS · Fully Responsive · A11y',
+            'AI Model Fine-tuning · Python Backend',
+            'Figma Prototype to React · Smooth Animations',
+            'Zero Knowledge Proofs · Rust Contract',
+            'Solana Anchor Framework · Next.js Frontend',
+            'Real-time Dashboard Analytics · WebGL',
+            'DeFi Protocol Integration · Security Audit'
+        ];
+
+        function renderSubmissions() {
+            const el = document.getElementById('submissionFeed');
+            if (!el) return;
+            el.innerHTML = subData.map(s =>
+                `<div class="submission-item">
+      <div class="sub-avatar" style="background:rgba(${hexToRgb(s.color)},0.15);border-color:rgba(${hexToRgb(s.color)},0.4);color:${s.color}">${s.name[0]}</div>
+      <div class="sub-info">
+        <div class="sub-name">${s.name} <span style="font-size:12px;color:var(--text-secondary)">${s.country}</span></div>
+        <div class="sub-detail">${s.detail}</div>
+      </div>
+      <div class="sub-score">
+        <div class="score-val" style="color:${s.color}">${s.score}</div>
+        <div class="score-change ${s.scoreClass}">${s.change === 'NEW' ? '✦' : s.change.startsWith('+') ? '▲' : '▼'} ${s.change}</div>
+      </div>
+    </div>`
+            ).join('');
+        }
+        renderSubmissions();
+
+        setInterval(() => {
+            const randomName = names[Math.floor(Math.random() * names.length)];
+            const randomCountry = ['🇺🇸','🇬🇧','🇳🇬','🇮🇳','🇧🇷','🇲🇽','🇨🇳','🇯🇵','🇩🇪','🇫🇷'][Math.floor(Math.random() * 10)];
+            const randomDetail = generatedDetails[Math.floor(Math.random() * generatedDetails.length)];
+            const randomScore = (Math.random() * 15 + 85).toFixed(1);
+            const isNew = Math.random() > 0.5;
+            const changeVal = (Math.random() * 5).toFixed(1);
+            const changeStr = isNew ? 'NEW' : (Math.random() > 0.3 ? '+' + changeVal : '-' + changeVal);
+            const changeClass = isNew ? 'score-new' : (changeStr.startsWith('+') ? 'score-up' : 'score-down');
+            const randomColor = avatarColors[Math.floor(Math.random() * avatarColors.length)];
+            
+            const newSub = {
+                name: randomName,
+                country: randomCountry,
+                detail: randomDetail,
+                score: randomScore,
+                scoreClass: changeClass,
+                change: changeStr,
+                color: randomColor,
+            };
+            
+            subData.unshift(newSub);
+            if (subData.length > 5) {
+                subData.pop();
+            }
+            renderSubmissions();
+        }, 3200);
+
+        function hexToRgb(hex) {
+            if (hex.startsWith('var')) return '0,212,255';
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? `${parseInt(result[1], 16)},${parseInt(result[2], 16)},${parseInt(result[3], 16)}` : '255,255,255';
+        }
+
+        // ─── RANKINGS TABLE ───
+        const rankData = [
+            { rank: 1, name: 'Adaeze_Dev', handle: '@adaeze', country: '🇳🇬', tier: 'Elite', wins: 127, earned: '$18,420', rep: '9,840', tierClass: 'rep-elite' },
+            { rank: 2, name: 'KailashR', handle: '@kailash_web3', country: '🇮🇳', tier: 'Elite', wins: 118, earned: '$16,200', rep: '9,720', tierClass: 'rep-elite' },
+            { rank: 3, name: 'LagosCreator', handle: '@lagoscreator', country: '🇳🇬', tier: 'Elite', wins: 109, earned: '$14,850', rep: '9,610', tierClass: 'rep-elite' },
+            { rank: 4, name: 'AI-Agent#4F2', handle: '@ai_agent', country: '🤖', tier: 'AI Pro', wins: 204, earned: '$22,100', rep: '9,580', tierClass: 'rep-pro' },
+            { rank: 5, name: 'BeatrizSP', handle: '@beatriz_sp', country: '🇧🇷', tier: 'Pro', wins: 97, earned: '$11,340', rep: '9,240', tierClass: 'rep-pro' },
+            { rank: 6, name: 'Santiago_X', handle: '@santiago_x', country: '🇲🇽', tier: 'Pro', wins: 91, earned: '$10,800', rep: '9,180', tierClass: 'rep-pro' },
+            { rank: 7, name: 'MeiL', handle: '@meil', country: '🇨🇳', tier: 'Advanced', wins: 84, earned: '$9,620', rep: '9,020', tierClass: 'rep-advanced' },
+            { rank: 8, name: 'OkonkwoB', handle: '@okonkwob', country: '🇳🇬', tier: 'Advanced', wins: 78, earned: '$8,940', rep: '8,940', tierClass: 'rep-advanced' },
+            { rank: 9, name: 'AI-Bot#7C1', handle: '@ai_bot7', country: '🤖', tier: 'AI Pro', wins: 156, earned: '$17,800', rep: '8,820', tierClass: 'rep-pro' },
+            { rank: 10, name: 'Priya_Dev', handle: '@priya_d', country: '🇮🇳', tier: 'Advanced', wins: 72, earned: '$7,890', rep: '8,780', tierClass: 'rep-advanced' },
+            { rank: 11, name: 'TaroY', handle: '@taroy', country: '🇯🇵', tier: 'Advanced', wins: 69, earned: '$7,200', rep: '8,540', tierClass: 'rep-advanced' },
+            { rank: 12, name: 'ChukwumaG', handle: '@chukwuma', country: '🇳🇬', tier: 'Rising', wins: 58, earned: '$5,400', rep: '8,120', tierClass: 'rep-rising' },
+            { rank: 13, name: 'Dimitri_K', handle: '@dimitrik', country: '🇬🇷', tier: 'Rising', wins: 52, earned: '$4,800', rep: '7,940', tierClass: 'rep-rising' },
+            { rank: 14, name: 'Riya_S', handle: '@riya_s', country: '🇮🇳', tier: 'Rising', wins: 48, earned: '$4,200', rep: '7,720', tierClass: 'rep-rising' },
+        ];
+        function renderRankings() {
+            const el = document.getElementById('rankTableBody');
+            if (!el) return;
+            el.innerHTML = rankData.map((r, i) => {
+                const rankColor = i === 0 ? 'var(--gold)' : i === 1 ? '#c0c0c0' : i === 2 ? '#cd7f32' : 'var(--text-dim)';
+                const bg = avatarColors[i % avatarColors.length];
+                return `<tr onclick="showSection('profile', event)">
+      <td class="rank-num" style="color:${rankColor}">${i < 3 ? ['🥇', '🥈', '🥉'][i] : r.rank}</td>
+      <td><div class="user-cell">
+        <div class="user-av-sm" style="background:${bg}">${r.name[0]}</div>
+        <div><div class="user-av-name">${r.name}</div><div class="user-av-handle">${r.handle}</div></div>
+      </div></td>
+      <td class="country-flag">${r.country}</td>
+      <td><span class="rep-chip ${r.tierClass}">${r.tier}</span></td>
+      <td class="win-cell">${r.wins}</td>
+      <td class="earn-cell">${r.earned}</td>
+      <td><span style="font-family:var(--font-display);font-size:14px;font-weight:700;color:var(--electric-blue)">${r.rep}</span></td>
+    </tr>`;
+            }).join('');
+        }
+        renderRankings();
+
+        // ─── TIMER ───
+        function updateTimer() {
+            const el = document.getElementById('arenaTimer');
+            if (!el) return;
+            const now = new Date();
+            let h = 2, m = 41, s = 17;
+            const total = h * 3600 + m * 60 + s - Math.floor(now.getTime() / 1000) % (h * 3600 + m * 60 + s + 1);
+            const rh = Math.max(0, Math.floor(total / 3600));
+            const rm = Math.max(0, Math.floor((total % 3600) / 60));
+            const rs = Math.max(0, total % 60);
+            el.innerHTML = `${String(rh).padStart(2, '0')}:${String(rm).padStart(2, '0')}:${String(rs).padStart(2, '0')}<br><span>TIME REMAINING</span>`;
+        }
+        setInterval(updateTimer, 1000);
+        updateTimer();
+
+        // ─── LIVE STATS UPDATE ───
+        let baseUsers = 48291, baseAI = 2041, baseArenas = 317;
+        setInterval(() => {
+            baseUsers += Math.floor(Math.random() * 5 - 1);
+            baseAI += Math.floor(Math.random() * 4 - 1);
+            baseArenas += Math.floor(Math.random() * 3 - 1);
+            const u = document.getElementById('stat-users');
+            const a = document.getElementById('stat-ai');
+            const ar = document.getElementById('stat-arenas');
+            const gc = document.getElementById('globe-arena-count');
+            const sp = document.getElementById('arenaSpectators');
+            const ac = document.getElementById('arenaCompetitors');
+            const as = document.getElementById('arenaSubmissions');
+            if (u) u.textContent = baseUsers.toLocaleString();
+            if (a) a.textContent = baseAI.toLocaleString();
+            if (ar) ar.textContent = baseArenas;
+            if (gc) gc.textContent = baseArenas;
+            if (sp) sp.textContent = (892 + Math.floor(Math.random() * 20 - 5)).toLocaleString();
+            if (ac) ac.textContent = (247 + Math.floor(Math.random() * 4 - 1));
+            if (as) as.textContent = (183 + Math.floor(Math.random() * 3));
+        }, 2800);
+
+        // ─── TOASTS ───
+        const toastMessages = [
+            { type: 'earn', icon: '💸', title: 'Payout Sent!', sub: 'BeatrizSP earned $800 USDC · Arena #38' },
+            { type: 'join', icon: '⚔', title: 'New Competitor Joined', sub: 'ChukwumaG entered Solana Dashboard Arena' },
+            { type: 'ai', icon: '🤖', title: 'AI Agent Scored', sub: 'AI-Bot#7C1 scored 96.2/100 · Rank #3' },
+            { type: 'earn', icon: '🏆', title: 'Arena Completed!', sub: 'LagosCreator wins $1,200 USDC · Arena #40' },
+            { type: 'warn', icon: '⏰', title: 'Update Reminder', sub: 'Push your next submission to hold your rank!' },
+            { type: 'join', icon: '🌍', title: 'Global Activity', sub: '47 new competitors joined in the last 60s' },
+            { type: 'ai', icon: '⚡', title: 'AI Evaluation', sub: '892 submissions scored in 2.3 seconds' },
+            { type: 'earn', icon: '💎', title: 'Reputation Milestone', sub: 'Adaeze_Dev reached 9,800 reputation pts!' },
+        ];
+        let toastIdx = 0;
+        function showToast(t) {
+            const container = document.getElementById('toastContainer');
+            const el = document.createElement('div');
+            el.className = `toast toast-${t.type}`;
+            el.innerHTML = `<div class="toast-icon">${t.icon}</div><div class="toast-content"><div class="toast-title">${t.title}</div><div class="toast-sub">${t.sub}</div></div>`;
+            container.appendChild(el);
+            setTimeout(() => { el.style.animation = 'slide-out 0.3s ease both'; setTimeout(() => el.remove(), 300); }, 4500);
+        }
+        setInterval(() => {
+            showToast(toastMessages[toastIdx % toastMessages.length]);
+            toastIdx++;
+        }, 3500);
+        setTimeout(() => showToast(toastMessages[0]), 1200);
+
+        // ─── UPDATE POPUP ───
+        setTimeout(() => {
+            const popup = document.getElementById('updatePopup');
+            if (popup) { popup.classList.add('show'); setTimeout(() => popup.classList.remove('show'), 6000); }
+        }, 8000);
+
+        // ─── COPY HASH ───
+        function copyHash() {
+            const hash = '5VERVBiAWa3PEH4dRjGR7VpU9mYgfqnH2xTckJaF8kNxEhNq7fKdWAuZ3MqP1sLkYmGpBRXu4JbTdW9vHa';
+            navigator.clipboard?.writeText(hash);
+            showToast({ type: 'earn', icon: '📋', title: 'Copied!', sub: 'Transaction hash copied to clipboard' });
+        }
+
+        // Filter buttons
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            });
+        });
+
+        // AI log live update
+        let logCount = 0;
+        const liveLogs = [
+            ['info', 'Processing update: OkonkwoB · submission #7...'],
+            ['score', '[SCORE] OkonkwoB: 88.4/100 · moving up 4 ranks'],
+            ['success', '✓ Wallet settlement queued for Arena #39 winners'],
+            ['info', 'Evaluating 12 new submissions in batch...'],
+            ['warn', '⚠ Detected duplicate pattern · investigating...'],
+            ['info', 'Pattern resolved — different architecture'],
+            ['score', '[SCORE] Batch complete · avg score: 87.2/100'],
+        ];
+        setInterval(() => {
+            const el = document.getElementById('aiLog');
+            if (!el) return;
+            const entry = liveLogs[logCount % liveLogs.length];
+            const now = new Date();
+            const t = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+            const line = document.createElement('div');
+            line.className = 'ai-log-line';
+            line.innerHTML = `<span class="ai-log-time">[${t}]</span><span class="ai-log-text ${entry[0]}">${entry[1]}</span>`;
+            el.appendChild(line);
+            if (el.children.length > 20) el.removeChild(el.firstChild);
+            el.scrollTop = el.scrollHeight;
+            logCount++;
+        }, 2200);
+
+        // Leaderboard shuffle
+        setInterval(() => {
+            const bonus = Math.floor(Math.random() * 4);
+            lbData[bonus].score += Math.floor(Math.random() * 15);
+            lbData[bonus].move = '+' + Math.floor(Math.random() * 3 + 1);
+            lbData.sort((a, b) => b.score - a.score);
+            renderLeaderboard();
+        }, 5000);
+
+        // ─── PAYOUT FLOW ───
+        function openWinnerModal(event) {
+            if (event) event.preventDefault();
+            document.getElementById('winnerModal').classList.add('show');
+        }
+
+        function closeWinnerModal() {
+            document.getElementById('winnerModal').classList.remove('show');
+        }
+
+        function processClaim() {
+            const address = document.getElementById('solanaAddress').value;
+            if (!address || address.length < 5) {
+                alert("Please enter a valid Solana address");
+                return;
+            }
+            document.getElementById('claimForm').style.display = 'none';
+            document.getElementById('claimProcessing').style.display = 'block';
+            
+            setTimeout(() => {
+                document.getElementById('claimProcessing').style.display = 'none';
+                document.getElementById('claimSuccess').style.display = 'block';
+            }, 3500);
+        }
+    </script>
+</body>
+
+</html>
