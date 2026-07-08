@@ -1,711 +1,468 @@
-# 🛡️ BuzzShield — Agentic Smart Contract Security on Kite AI
+# ATLAS
+### Autonomous RWA Underwriting Mesh — built on Casper
 
-> **The first pay-per-scan smart contract security service built for autonomous AI agents, powered by the x402 protocol on the Kite AI blockchain.**
+**ATLAS turns a real-world debt into investable capital in minutes — sourced, underwritten, tokenized, and settled entirely by autonomous AI agents that pay each other to do it, on Casper.**
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Network: Kite Testnet](https://img.shields.io/badge/Network-Kite%20Testnet-6366f1)](https://docs.gokite.ai)
-[![Chain ID: 2368](https://img.shields.io/badge/Chain%20ID-2368-10b981)](https://docs.gokite.ai/kite-chain/1-getting-started/network-information)
-[![Protocol: x402](https://img.shields.io/badge/Protocol-x402-f59e0b)](https://x402.org)
-[![Facilitator: Pieverse](https://img.shields.io/badge/Facilitator-Pieverse-ec4899)](https://facilitator.pieverse.io)
+*Casper Agentic Buildathon 2026 — Qualification Round Submission*
 
 ---
 
 ## Table of Contents
 
-- [What is BuzzShield?](#what-is-buzzshield)
-- [The Problem We Solve](#the-problem-we-solve)
-- [How It Works — The Full Architecture](#how-it-works--the-full-architecture)
-- [The x402 Payment Handshake — Step by Step](#the-x402-payment-handshake--step-by-step)
-- [Use Cases](#use-cases)
-- [Project Structure](#project-structure)
-- [Getting Started](#getting-started)
-- [API Reference](#api-reference)
-- [The Agent in Action](#the-agent-in-action)
-- [Technology Stack](#technology-stack)
-- [Why This Matters](#why-this-matters)
-- [Roadmap](#roadmap)
+1. [The Problem](#the-problem)
+2. [The Solution](#the-solution)
+3. [How ATLAS Works — Full Architecture Walkthrough](#how-atlas-works--full-architecture-walkthrough)
+4. [Use Cases](#use-cases)
+5. [Key Features](#key-features)
+6. [Tech Stack](#tech-stack)
+7. [Smart Contract Layer](#smart-contract-layer)
+8. [Project Structure](#project-structure)
+9. [Getting Started](#getting-started)
+10. [Implementation Status](#implementation-status)
+11. [Roadmap](#roadmap)
+12. [Track Alignment](#track-alignment)
+13. [License & Acknowledgments](#license--acknowledgments)
 
 ---
 
-## What is BuzzShield?
+## The Problem
 
-BuzzShield is a **Payment Initiation Service Provider (PISP)** and smart contract security scanner built on the Kite AI blockchain. It is the first production-ready demonstration of how AI agents can autonomously purchase security intelligence — paying per-request, in real-time, using stablecoins — with **zero human intervention at transaction time**.
+Real-world asset tokenization is one of the largest theses in crypto today, and it is structurally bottlenecked by one thing: **underwriting still requires a human.**
 
-At its core, BuzzShield proves three things simultaneously:
+- A small business with a legitimate, low-risk unpaid invoice waits days or weeks for a factoring company to manually review documents and approve funding — and the underwriting cost is often not worth it for smaller invoice sizes, which locks the smallest, most vulnerable originators out entirely.
+- An investor being asked to fund a stranger's invoice has almost no cheap way to verify the claim is real. Most "RWA" tokens today are backed by a PDF and a promise — there's no standard way to prove a document is authentic and unaltered without exposing the private financial data inside it.
+- Existing tokenization platforms are databases with a blockchain bolted on. A human still originates, prices, and lists every asset by hand. None of them treat the underwriting pipeline itself as something a coordinated swarm of AI agents can run autonomously.
 
-1. **AI agents can be economic actors.** An agent can identify a need, negotiate payment, settle a blockchain transaction, and use the result — all within a single HTTP round-trip.
-2. **Agentic infrastructure is real.** The Kite AI ecosystem (Kite Passport + x402 + Pieverse) provides the complete rails for this to happen at scale.
-3. **Security is a perfect use case.** Before any agent touches an unknown smart contract, it *should* verify safety. BuzzShield makes that verification instant, cheap ($0.02 per scan), and machine-native.
+## The Solution
 
----
+ATLAS replaces the human underwriting pipeline with six purpose-built AI agents, each with exactly one job, communicating over **MCP**, paying each other over **x402** for every unit of work they request, and writing their own smart contracts through **Odra** rather than relying on a developer to hand-code a bespoke contract per asset.
 
-## The Problem We Solve
+Trust between strangers is established without exposing private data. When an originator submits a claim, they attach the real supporting document. ATLAS fingerprints it (SHA-256) and anchors **only the fingerprint** on-chain — never the document. Investors can verify an asset is real and unaltered without ever seeing the private paperwork behind it.
 
-### For AI Agents
-
-Today's AI agents are increasingly capable of performing complex financial and on-chain operations — swapping tokens, executing trades, managing portfolios. But before any agent interacts with an unfamiliar smart contract, it faces a critical question: **Is this contract safe?**
-
-Without an answer, agents are blind. They may unknowingly interact with:
-- **Drainer contracts** — which silently empty connected wallets
-- **Rug pulls** — projects designed to collapse after extracting liquidity
-- **Honeypots** — contracts that accept deposits but block withdrawals
-- **Malicious approvals** — functions that grant unlimited token access to attackers
-
-### For the Payment Infrastructure
-
-Existing security solutions require subscriptions, API keys, and manual billing — none of which AI agents can manage. There was no way for an agent to *buy* security intelligence on-demand, in the moment it was needed, without human setup.
-
-### BuzzShield's Solution
-
-A security API that speaks the language of machines. Using the **x402 protocol**, BuzzShield issues a machine-readable payment challenge for every unauthenticated request. Agents that have a Kite Passport respond by authorizing a micro-payment ($0.02 USDC.e), settling it on-chain, and receiving the security report — all in under 3 seconds.
-
-No API keys. No subscriptions. No monthly invoices. **Pay exactly when you scan, for exactly what you scanned.**
+ATLAS is genuinely two-sided: the originator gets a real-time funding dashboard, and the investor gets a fully transparent marketplace with a complete, auditable underwriting trail behind every listing.
 
 ---
 
-## How It Works — The Full Architecture
+## How ATLAS Works — Full Architecture Walkthrough
 
-The following diagram illustrates the complete system architecture — every component, every interaction, and the full lifecycle of a BuzzShield request from the agent's first call to the on-chain settlement receipt.
+This section is intentionally detailed. ATLAS is not one AI model wrapped around a UI — it's a coordinated mesh of independent agents, an on-chain settlement layer, and a two-sided product experience, and understanding how those three layers connect is the core of what makes this project work. Read this top to bottom for the full picture, or jump to whichever diagram you need.
 
-```
-╔══════════════════════════════════════════════════════════════════════════════════╗
-║                        BUZZSHIELD — SYSTEM ARCHITECTURE                         ║
-╠══════════════════════════════════════════════════════════════════════════════════╣
-║                                                                                  ║
-║   ┌─────────────────────────────────────────────────────────────────────────┐   ║
-║   │                        USER / AGENT OWNER                               │   ║
-║   │   Sets a $5 spending budget in Kite Portal · Signs Session once         │   ║
-║   └──────────────────────────────────┬──────────────────────────────────────┘   ║
-║                                      │ Delegates spending authority              ║
-║                                      ▼                                           ║
-║   ┌──────────────────────────────────────────────────────────────────────────┐  ║
-║   │                         KITE PASSPORT                                    │  ║
-║   │                   (Identity + Wallet + MCP Server)                       │  ║
-║   │                                                                          │  ║
-║   │   • Holds user's on-chain AA wallet (Account Abstraction)                │  ║
-║   │   • Enforces spending rules set by user (Session)                        │  ║
-║   │   • Exposes MCP tools: get_payer_addr · approve_payment                  │  ║
-║   │   • Signs payment authorizations without exposing private keys           │  ║
-║   │                                                                          │  ║
-║   └────────────────────────┬─────────────────────────────────────────────────┘ ║
-║                             │  MCP tool calls (JSON-RPC over HTTPS)              ║
-║                             │                                                    ║
-║   ┌─────────────────────────▼──────────────────────────────────────────────┐    ║
-║   │                      BUZZSHIELD AGENT                                   │    ║
-║   │              (Autonomous Node.js Program — agent/agent.js)              │    ║
-║   │                                                                         │    ║
-║   │   1. Loads a list of contracts to scan                                  │    ║
-║   │   2. Calls BuzzShield /shield endpoint                                  │    ║
-║   │   3. Receives HTTP 402 — reads the payment bill                         │    ║
-║   │   4. Calls Kite Passport MCP to authorize payment                       │    ║
-║   │   5. Retries request with X-Payment header                              │    ║
-║   │   6. Receives scan result — makes a security decision                   │    ║
-║   │   7. Prints full report — zero human involvement                        │    ║
-║   │                                                                         │    ║
-║   └──────────────────┬───────────────────────────────────────┬─────────────┘    ║
-║                       │  POST /shield                          │  POST /shield   ║
-║                       │  (no payment — attempt 1)             │  (with X-Payment ║
-║                       │                                        │   header)        ║
-║                       ▼                                        ▼                 ║
-║   ┌────────────────────────────────────────────────────────────────────────┐    ║
-║   │                    BUZZSHIELD API SERVER                                │    ║
-║   │                (backend/server.js — Express.js)                        │    ║
-║   │                                                                        │    ║
-║   │   ┌─────────────────────────────────────────────────────────────────┐  │    ║
-║   │   │                  x402 GATEKEEPER MIDDLEWARE                     │  │    ║
-║   │   │                  (backend/middleware/x402.js)                   │  │    ║
-║   │   │                                                                 │  │    ║
-║   │   │  No X-Payment header?  ──▶  Return 402 + payment bill          │  │    ║
-║   │   │  X-Payment found?      ──▶  Forward to Pieverse for settlement  │  │    ║
-║   │   │  Settlement confirmed? ──▶  Pass request to scanner             │  │    ║
-║   │   └──────────────────────────────────┬──────────────────────────────┘  │    ║
-║   │                                       │                                 │    ║
-║   │   ┌───────────────────────────────────▼──────────────────────────────┐  │   ║
-║   │   │                   SCANNER ENGINE                                  │  │   ║
-║   │   │               (backend/services/scanner.js)                      │  │   ║
-║   │   │                                                                   │  │   ║
-║   │   │  • Checks contract against known drainer registry                 │  │   ║
-║   │   │  • Analyzes address patterns for suspicious signatures             │  │   ║
-║   │   │  • Computes a 0–100 risk score                                    │  │   ║
-║   │   │  • Returns verdict: SAFE · SUSPICIOUS · MALICIOUS                 │  │   ║
-║   │   └───────────────────────────────────────────────────────────────────┘  │   ║
-║   └────────────────────────────────────────────┬───────────────────────────────┘ ║
-║                                                 │  POST /v2/settle                ║
-║                                                 │  (payment signature)            ║
-║                                                 ▼                                 ║
-║   ┌─────────────────────────────────────────────────────────────────────────┐    ║
-║   │                        PIEVERSE FACILITATOR                              │    ║
-║   │                    (https://facilitator.pieverse.io)                     │    ║
-║   │                                                                          │    ║
-║   │   • Receives the payment signature from BuzzShield                       │    ║
-║   │   • Verifies the EIP-712 signature is valid and unspent                  │    ║
-║   │   • Calls transferWithAuthorization on the USDC.e contract               │    ║
-║   │   • Moves $0.02 from agent's AA wallet → BuzzShield merchant wallet      │    ║
-║   │   • Returns on-chain settlement receipt                                   │    ║
-║   │                                                                          │    ║
-║   └────────────────────────────────────┬─────────────────────────────────────┘   ║
-║                                         │  On-chain transaction                   ║
-║                                         ▼                                         ║
-║   ┌─────────────────────────────────────────────────────────────────────────┐    ║
-║   │                        KITE L1 BLOCKCHAIN                                │    ║
-║   │              Chain ID: 2368 · RPC: rpc-testnet.gokite.ai                 │    ║
-║   │                                                                           │   ║
-║   │   Token: USDC.e (0x0fF5393387ad2f9f691FD6Fd28e07E3969e27e63)             │   ║
-║   │   Explorer: testnet.kitescan.ai                                           │   ║
-║   │   Every transaction recorded permanently and transparently                │   ║
-║   │                                                                           │   ║
-║   └───────────────────────────────────────────────────────────────────────────┘  ║
-║                                                                                  ║
-╚══════════════════════════════════════════════════════════════════════════════════╝
-```
-
----
-
-## The x402 Payment Handshake — Step by Step
-
-This is the most important flow to understand. It is the backbone of everything BuzzShield does. The x402 protocol turns a standard HTTP request into a complete commercial transaction in four moves.
+### 1. System Overview — who talks to whom
 
 ```
-                    THE x402 PAYMENT HANDSHAKE
-   ─────────────────────────────────────────────────────────────────
+┌──────────────────────────────────────────────────────────────────────────────────┐
+│                              ATLAS — SYSTEM OVERVIEW                              │
+└──────────────────────────────────────────────────────────────────────────────────┘
 
-    AI AGENT                 BUZZSHIELD API              KITE PASSPORT
-        │                         │                           │
-        │                         │                           │
-        │  ① POST /shield         │                           │
-        │  (no payment header)    │                           │
-        │ ─────────────────────▶  │                           │
-        │                         │                           │
-        │  ② HTTP 402 Response    │                           │
-        │  {                      │                           │
-        │    scheme: gokite-aa    │                           │
-        │    amount: $0.02        │                           │
-        │    payTo: 0xEfD04...    │                           │
-        │    network: kite-testnet│                           │
-        │  }                      │                           │
-        │ ◀─────────────────────  │                           │
-        │                         │                           │
-        │  ③ MCP: get_payer_addr  │                           │
-        │ ─────────────────────────────────────────────────▶  │
-        │                         │                           │
-        │  { payer_addr: 0x742... }                           │
-        │ ◀─────────────────────────────────────────────────  │
-        │                         │                           │
-        │  ④ MCP: approve_payment │                           │
-        │  (amount, payee, token) │                           │
-        │ ─────────────────────────────────────────────────▶  │
-        │                         │                           │
-        │  { x_payment: "eyJ..." }│                           │
-        │ ◀─────────────────────────────────────────────────  │
-        │                         │                           │
-        │  ⑤ POST /shield         │                           │
-        │  X-Payment: eyJ...      │                           │
-        │ ─────────────────────▶  │                           │
-        │                         │                           │
-        │                         │  ⑥ POST /v2/settle        │
-        │                         │  (to Pieverse)            │
-        │                         │ ──────────────────────────▶ PIEVERSE
-        │                         │                              │
-        │                         │  ⑦ On-chain TX              │
-        │                         │  $0.02 moves                │ ──▶ KITE L1
-        │                         │                              │
-        │                         │  ⑧ { settled: true }        │
-        │                         │ ◀──────────────────────────  │
-        │                         │                           │
-        │  ⑨ 200 OK               │                           │
-        │  {                      │                           │
-        │    verdict: "SAFE"      │                           │
-        │    riskScore: 95        │                           │
-        │    flags: []            │                           │
-        │    paymentReceipt: {...} │                          │
-        │  }                      │                           │
-        │ ◀─────────────────────  │                           │
-        │                         │                           │
-
-   ─────────────────────────────────────────────────────────────────
-   Total time: ~2–3 seconds  |  Cost: $0.02 USDC.e  |  Fully autonomous
+     ┌─────────────────┐                                    ┌─────────────────┐
+     │    ORIGINATOR    │                                    │     INVESTOR     │
+     │  (needs capital  │                                    │ (deploys capital │
+     │  against a real  │                                    │  into verified   │
+     │  world asset)    │                                    │  yield assets)   │
+     └────────┬─────────┘                                    └────────┬─────────┘
+              │                                                        │
+              │  1. Describes asset +                    5. Browses   │
+              │     attaches document                       marketplace,
+              │     (fingerprinted client-side)             invests
+              ▼                                                        ▼
+     ┌────────────────────────────────────────────────────────────────────────┐
+     │                            ATLAS  FRONTEND                              │
+     │   Home · Swarm View · Result · My Funding · Marketplace · Asset         │
+     │   Detail · Agent Network · Analytics · Portfolio                       │
+     └────────────────────────────┬─────────────────────────────────────────┘
+                                   │  2. submits request payload
+                                   │     (claim + document fingerprint)
+                                   ▼
+     ┌────────────────────────────────────────────────────────────────────────┐
+     │                     ATLAS AGENT MESH  (each agent = its own MCP server) │
+     │                                                                        │
+     │   ┌─────────┐   x402   ┌────────────┐  x402  ┌────────────┐           │
+     │   │  SCOUT  │─────────▶│ UNDERWRITER│───────▶│ COMPLIANCE │           │
+     │   │  AGENT  │          │   AGENT    │        │   AGENT    │           │
+     │   └────┬────┘          └─────┬──────┘        └─────┬──────┘           │
+     │        │ x402                │ x402                │ x402             │
+     │        ▼                     ▼                     ▼                  │
+     │  Document registry    Credit bureau          KYC / AML provider       │
+     │  cross-check           risk pull              eligibility check       │
+     │                                                      │                 │
+     │                                                      ▼                 │
+     │                                          ┌────────────────────┐        │
+     │                                          │  TOKENIZATION AGENT │        │
+     │                                          │  writes + deploys   │        │
+     │                                          │  bespoke Odra       │        │
+     │                                          │  contract           │        │
+     │                                          └──────────┬──────────┘        │
+     │                                                     │ x402               │
+     │                                                     ▼                    │
+     │                                          ┌────────────────────┐         │
+     │                                          │  MARKET-MAKER AGENT │         │
+     │                                          │  prices, tranches,  │         │
+     │                                          │  lists liquidity    │         │
+     │                                          │  via CSPR.trade MCP │         │
+     │                                          └──────────┬──────────┘         │
+     │                                                     │                    │
+     │                        ┌────────────────────────────┘                   │
+     │                        ▼                                                │
+     │              ┌──────────────────┐                                       │
+     │              │   ORACLE AGENT    │  ◀── activates AFTER tokenization,   │
+     │              │  (runs forever,   │      re-checks real-world repayment  │
+     │              │   post-issuance)  │      on a recurring cycle             │
+     │              └─────────┬─────────┘                                      │
+     └────────────────────────┼──────────────────────────────────────────────┘
+                               │  3. writes verified state, mints, updates
+                               ▼
+     ┌────────────────────────────────────────────────────────────────────────┐
+     │                         CASPER TESTNET  (on-chain layer)                │
+     │                                                                        │
+     │   ┌──────────────────┐  ┌───────────────────┐  ┌────────────────────┐ │
+     │   │ Receivable /      │  │ Document Anchor    │  │ Compliance          │ │
+     │   │ Asset Tokenization│  │ Registry            │  │ Credential Contract │ │
+     │   │ Contract (Odra)   │  │ (SHA-256 fingerprint│  │ (non-transferable)  │ │
+     │   │  — one per asset  │  │  only, never the    │  │                     │ │
+     │   │                   │  │  document itself)   │  │                     │ │
+     │   └──────────────────┘  └───────────────────┘  └────────────────────┘ │
+     │                          ┌───────────────────┐                         │
+     │                          │ Oracle Update Log   │                         │
+     │                          │ (append-only trust  │                         │
+     │                          │  score history)     │                         │
+     │                          └───────────────────┘                         │
+     └────────────────────────────────────────────────────────────────────────┘
+                               │
+                               │  4. reflected back to both dashboards
+                               ▼
+     ┌─────────────────┐                                    ┌─────────────────┐
+     │  MY FUNDING      │                                    │  MARKETPLACE +   │
+     │  DASHBOARD        │                                    │  ASSET DETAIL +  │
+     │  (originator view)│                                    │  PORTFOLIO        │
+     │  tranche-by-tranche│                                   │  (investor view)  │
+     │  disbursement,     │                                   │  full underwriting│
+     │  $0 repayment       │                                  │  trail per asset   │
+     │  obligation         │                                  │                    │
+     └─────────────────┘                                    └─────────────────┘
 ```
 
-### What each step means in plain English
+### 2. The agent pipeline, in sequence — with what each agent actually does
 
-| Step | What's Happening |
-|------|-----------------|
-| ① | The agent asks BuzzShield to scan a contract. No payment attached yet. |
-| ② | BuzzShield says "not yet — here's my bill." The bill is machine-readable JSON. |
-| ③ | The agent asks Kite Passport: "what's my wallet address?" |
-| ④ | The agent asks Kite Passport: "authorize a $0.02 payment to this address." Kite checks the user's pre-approved Session and signs the authorization. |
-| ⑤ | The agent re-sends the original request, this time with the signed payment proof in the header. |
-| ⑥ | BuzzShield extracts the payment signature and sends it to Pieverse to settle. |
-| ⑦ | Pieverse executes the on-chain transfer — $0.02 moves from the agent's wallet to BuzzShield's merchant wallet on Kite L1. |
-| ⑧ | Pieverse confirms settlement to BuzzShield. |
-| ⑨ | BuzzShield runs the security scan and returns the result with a payment receipt. |
+Each agent in ATLAS is a single-responsibility, independently discoverable service. None of them are "the same model doing five things" — each one is scoped to one job, one set of inputs, and one output, which is what makes the swarm auditable step-by-step rather than a black box.
+
+```
+STAGE 1 — SCOUT AGENT                              STAGE 2 — UNDERWRITER AGENT
+────────────────────────────                       ─────────────────────────────
+Input:  uploaded document + claim                    Input:  Scout's verified data
+Action: • re-hashes the document (SHA-256)                   + external credit signal
+        • cross-references extracted fields          Action: • requests counterparty
+          (amount, counterparty, due date)              credit data (paid x402 call)
+          against the claim                                   • runs fraud heuristics on
+        • anchors the fingerprint on-chain                    document metadata
+Output: verified document + on-chain anchor tx               • produces numeric risk score
+        ────────────────▶                            Output: risk score + rationale
+                                                               ────────────────▶
+
+STAGE 3 — COMPLIANCE AGENT                          STAGE 4 — TOKENIZATION AGENT
+────────────────────────────                        ─────────────────────────────
+Input:  originator + counterparty identity            Input:  risk score + compliance
+Action: • verifies eligibility via KYC/AML                    credential + asset class
+          provider (paid x402 call)                  Action: • selects the correct Odra
+        • mints on-chain compliance                            contract template
+          credential                                          • generates a bespoke
+Output: compliance credential token                            contract for THIS asset
+        ────────────────▶                                     • deploys to Casper Testnet
+                                                       Output: live, asset-specific
+                                                               smart contract
+                                                               ────────────────▶
+
+STAGE 5 — MARKET-MAKER AGENT                        STAGE 6 — ORACLE AGENT
+────────────────────────────                        ─────────────────────────────
+Input:  deployed contract + risk score                Input:  the live, tokenized asset
+Action: • prices yield based on risk + term           Action: • runs on a recurring cycle,
+        • structures senior / junior tranche                   for the LIFE of the asset
+        • seeds liquidity via CSPR.trade MCP                  • re-checks real-world
+Output: live marketplace listing                                repayment status
+        ────────────────▶                                     • updates the on-chain trust
+                                                                  score with each check
+                                                       Output: continuously-verified,
+                                                               living trust score
+```
+
+### 3. The trust mechanism — how a stranger's document becomes verifiable
+
+This is the piece that makes ATLAS an underwriting system and not just a tokenization wrapper. An investor is being asked to fund a document they will never see. Here is exactly how that's made trustworthy:
+
+```
+  ORIGINATOR'S DEVICE                    ATLAS AGENT MESH                CASPER TESTNET
+  ────────────────────                   ─────────────────               ───────────────
+
+  [ Real invoice document ]
+           │
+           │  hashed locally
+           │  (SHA-256, client-side —
+           │   the file itself never
+           │   leaves the originator's
+           │   control unencrypted)
+           ▼
+  [ Fingerprint generated ]
+  9f2a4c7e1d6b3805a2e9f61c8d3b5a70e4f9c2a1d6b8e3f705a91c4d2ee41c1b
+           │
+           │  submitted alongside the
+           │  plain-language claim
+           ▼
+                                    [ SCOUT AGENT ]
+                                          │
+                                          │  re-hashes the SAME document
+                                          │  server-side to confirm the
+                                          │  fingerprint hasn't been swapped
+                                          │
+                                          │  extracts structured fields
+                                          │  (amount, counterparty, due date)
+                                          │  and compares them against the
+                                          │  originator's plain-language claim
+                                          ▼
+                                 ┌──────────────────────┐
+                                 │  Declared   Extracted  │
+                                 │  $50,000  ✓ $50,000    │
+                                 │  Meridian ✓ Meridian    │
+                                 │  Net-60   ✓ Net-60      │
+                                 └──────────┬───────────┘
+                                            │  match confirmed
+                                            ▼
+                                                                    [ Document Anchor
+                                                                      Registry ]
+                                                                    fingerprint + timestamp
+                                                                    + asset reference
+                                                                    anchored on-chain
+                                                                            │
+                                                                            ▼
+                                                                    Anyone — including an
+                                                                    investor who has never
+                                                                    seen the original file —
+                                                                    can re-hash the same
+                                                                    document later and
+                                                                    confirm it matches. If
+                                                                    a single character had
+                                                                    been changed, the
+                                                                    fingerprints would not
+                                                                    match, and the mismatch
+                                                                    would be publicly
+                                                                    provable.
+```
+
+**Why this matters:** the document itself is never made public — only its cryptographic fingerprint is. This preserves the originator's privacy (their invoice may contain sensitive commercial terms) while still giving investors mathematical, not reputational, proof that the asset backing their investment is real and unaltered.
+
+### 4. Two-sided by design — the originator and the investor see the same asset differently
+
+Most RWA tokenization demos are built entirely from the investor's point of view. ATLAS treats the originator — the person the entire system exists to serve — as an equally important user, with their own dedicated experience:
+
+```
+                         ┌───────────────────────────┐
+                         │   ONE TOKENIZED ASSET       │
+                         │   INV-ATLAS-0417             │
+                         └──────────────┬──────────────┘
+                                         │
+                ┌────────────────────────┴────────────────────────┐
+                ▼                                                   ▼
+   ┌─────────────────────────────┐                   ┌─────────────────────────────┐
+   │      ORIGINATOR VIEW          │                   │       INVESTOR VIEW          │
+   │      "My Funding"             │                   │   Marketplace → Asset Detail │
+   ├─────────────────────────────┤                   ├─────────────────────────────┤
+   │ • Funding status (% funded)   │                   │ • Yield, term, tranche        │
+   │ • Tranche-by-tranche          │                   │ • Full underwriting trail     │
+   │   disbursement received       │                   │   (every agent's report)      │
+   │ • Advance rate & total        │                   │ • Document verification        │
+   │   advance amount              │                   │   report (declared vs.         │
+   │ • Explicit statement:         │                   │   extracted, with checkmarks)  │
+   │   "Your repayment             │                   │ • Live agent activity           │
+   │    obligation: $0" —          │                   │   timeline for this asset       │
+   │   the debtor pays ATLAS       │                   │ • Buy panel with live           │
+   │   directly, not the           │                   │   projected-return calculator   │
+   │   originator                  │                   │ • Position appears in the       │
+   │                                │                   │   investor's own Portfolio,     │
+   │                                │                   │   clickable for full history    │
+   └─────────────────────────────┘                   └─────────────────────────────┘
+```
+
+### 5. Continuous verification — underwriting doesn't stop at issuance
+
+Static tokenization platforms treat underwriting as a one-time event: an asset is checked once, tokenized, and then left alone. ATLAS's Oracle Agent is designed specifically to close that gap:
+
+```
+   TOKENIZATION                                              MATURITY
+        │                                                         │
+        ▼                                                         ▼
+   ●────────●────────●────────●────────●────────●────────●────────●
+   │        │        │        │        │        │        │        │
+  mint   check 1   check 2  check 3  check 4  check 5  check 6  final
+                                                                 check
+   │        │        │        │        │        │        │        │
+   └────────┴────────┴────────┴────────┴────────┴────────┴────────┘
+              every check: Oracle Agent re-verifies real-world
+              repayment status, writes a trust-score delta to the
+              on-chain Oracle Update Log, and the asset's trust
+              score on the Marketplace updates accordingly —
+              visible to every current and prospective investor
+```
 
 ---
 
 ## Use Cases
 
-BuzzShield is not just a scanner — it is **agentic security infrastructure**. Any system that interacts with smart contracts is a potential consumer.
+ATLAS is built around trade receivable factoring as its flagship use case, but the underwriting mesh is asset-class agnostic — any real-world claim with a document behind it and a predictable payment can move through the same pipeline. Below are the primary use cases the platform is designed to serve.
 
-### 1. DeFi Trading Agents
+### 1. Small business invoice factoring (the flagship use case)
+A small business has delivered goods or services and holds a legitimate invoice that won't be paid for 30–90 days. Rather than waiting on a bank or a traditional factoring company — both of which are often uneconomical for smaller invoice sizes — the business submits the invoice to ATLAS and receives funding in tranches as investors fund the listing, often within minutes of the swarm completing underwriting. This is the single largest addressable use case: trade finance is a multi-trillion-dollar global market, and small businesses are consistently the most underserved segment of it.
 
-An autonomous trading agent identifying arbitrage opportunities or yield farming positions must interact with many smart contracts it has never seen before. Before executing any transaction, the agent calls BuzzShield to verify the contract is not a honeypot, rug pull, or drainer.
+### 2. Solar and renewable-energy lease monetization
+Solar developers and asset owners often hold long-duration lease agreements (12–24 months or longer) with predictable, contracted payments. ATLAS allows these future cash flows to be tokenized and sold to investors seeking longer-duration yield, giving renewable energy operators faster access to capital for reinvestment in new installations — directly supporting the buildout of clean energy infrastructure.
 
-```
-Trading Agent → finds high-yield pool → calls BuzzShield for scan
-             → verdict: SAFE → proceeds with $10,000 deposit
-             → verdict: MALICIOUS → aborts, logs threat, moves on
-```
+### 3. Rent roll tokenization for real estate operators
+A landlord or property manager with a stable, documented rent roll can tokenize future rental income as a yield instrument, converting predictable but illiquid income into upfront capital without selling the underlying property or taking on traditional debt.
 
-**Impact:** Prevents agent from losing user funds to malicious contracts. Each scan costs $0.02 — a negligible insurance premium against potentially catastrophic losses.
+### 4. Carbon credit forward financing
+Carbon credit originators — reforestation projects, carbon capture operations — often need capital before their credits are fully issued or sold. ATLAS allows a forward claim on future carbon credit issuance to be underwritten and tokenized, giving climate-focused projects earlier access to capital while giving investors a way to gain exposure to carbon markets through a verified, structured instrument.
 
----
+### 5. Portfolio diversification for on-chain investors
+For investors, ATLAS is a way to gain exposure to real-world, cash-flow-backed yield that does not correlate with crypto-native market cycles — filling a category that is currently underserved on-chain, where most yield opportunities are either purely crypto-collateralized or backed by opaque off-chain claims with no verification layer.
 
-### 2. NFT Purchase Agents
-
-An agent tasked with buying NFTs on behalf of a user needs to interact with marketplace contracts, collection contracts, and sometimes third-party royalty contracts. BuzzShield provides a pre-flight safety check before every new contract interaction.
-
-```
-NFT Agent → identifies desired collection → BuzzShield scans contract
-          → riskScore: 88, verdict: SAFE → proceeds with mint
-          → riskScore: 12, verdict: MALICIOUS → reports to user, stops
-```
-
-**Impact:** Protects users from fake NFT projects and phishing contract addresses that mimic legitimate collections.
+### 6. Embedded finance for fintech platforms (forward-looking)
+Because every ATLAS agent is exposed as an independent MCP server, other fintech products and platforms could eventually integrate ATLAS's underwriting mesh directly into their own applications — offering their users instant, verifiable asset-backed financing without building an underwriting pipeline of their own. This positions ATLAS not just as a standalone marketplace, but as underwriting infrastructure other builders on Casper can plug into.
 
 ---
 
-### 3. Multi-Agent Orchestration Systems
+## Key Features
 
-In a multi-agent setup, a coordinator agent dispatches specialist agents to perform specific tasks. BuzzShield becomes part of the coordinator's standard operating procedure — every contract address passed between agents is verified before use.
-
-```
-Coordinator Agent
-  ├─▶ Research Agent (finds contract addresses)
-  ├─▶ BuzzShield Agent (verifies each address)    ← BuzzShield here
-  └─▶ Execution Agent (only acts on SAFE verdicts)
-```
-
-**Impact:** Creates a security firewall between research and execution layers. Malicious addresses never reach the execution layer.
+- **Document fingerprinting and on-chain anchoring** — cryptographic proof an asset is real, without exposing private financial documents.
+- **A true six-agent underwriting swarm** — Scout, Underwriter, Compliance, Tokenization, Market-Maker, and Oracle, each an independently discoverable MCP server.
+- **Agent-to-agent x402 payments** — every handoff between agents, and every call to an external data provider, is a real, metered, on-chain-settled payment — visible live in the swarm's x402 ledger.
+- **Autonomous Odra contract generation** — the Tokenization Agent writes and deploys a bespoke smart contract per asset, using Casper's AI-discoverable Odra documentation, rather than relying on a single reused pool contract.
+- **Continuous post-issuance verification** — the Oracle Agent keeps re-checking real-world repayment for the life of every asset, maintaining a living, auditable trust score.
+- **A genuinely two-sided marketplace** — a dedicated originator funding dashboard alongside the investor marketplace, each showing the same asset from the perspective that matters to them.
+- **Full underwriting transparency** — every investor-facing asset page shows the complete agent trail: risk scores, compliance status, the document verification report, and a dated activity timeline.
+- **Live agent network visibility** — an Agent Network page showing every agent's current job, trust score, job count, and last payment made, so the system's ongoing activity is never hidden behind a single "processing…" spinner.
 
 ---
 
-### 4. Wallet & Portfolio Management Tools
+## Tech Stack
 
-Any tool that monitors, manages, or interacts with a user's DeFi portfolio can use BuzzShield to score every contract in the portfolio, flagging any that have been compromised or were malicious from the start.
+**Casper AI Toolkit (core infrastructure):**
+- **x402** — HTTP-native micropayments for every agent-to-agent and agent-to-provider transaction
+- **MCP (Model Context Protocol) servers** — used for agent discovery and for blockchain query/interaction access via the Casper MCP Server
+- **CSPR.trade MCP** — autonomous liquidity seeding and trade execution for tokenized assets
+- **CSPR.cloud APIs** — middleware layer agents use to read and write Casper chain state
+- **Odra Framework** (with `llms.txt` AI-discoverable documentation) — the smart contract framework used for autonomous, per-asset contract generation and deployment
 
-```
-Portfolio Manager runs nightly scan:
-  - Contract 0xABC: Score 94 ✅ SAFE
-  - Contract 0xDEF: Score 8  🚨 MALICIOUS — new drainer pattern detected
-  - Contract 0xGHI: Score 61 ⚠️ SUSPICIOUS — review recommended
-```
+**Frontend / Interface:**
+- Single-page interactive prototype (HTML/CSS/JavaScript), covering nine linked views: Home, Swarm, Result, My Funding, Marketplace, Asset Detail, Agent Network, Analytics, and Portfolio (with drill-down position detail)
 
-**Impact:** Provides ongoing contract health monitoring, alerting users to newly-identified threats in their existing positions.
-
----
-
-### 5. Cross-Chain Bridge Verification
-
-Before an agent bridges assets from one chain to another, it must verify both the source and destination bridge contracts are legitimate. BuzzShield provides rapid, paid verification for both endpoints.
-
-```
-Bridge Agent:
-  1. Scan source bridge contract → SAFE
-  2. Scan destination bridge contract → SAFE
-  3. Proceed with bridge transaction
-```
-
-**Impact:** Prevents users from bridging assets into fake bridge contracts — one of the most common attack vectors in DeFi.
+**Planned backend (see [Implementation Status](#implementation-status)):**
+- Agent runtime services, one per agent, each exposing its own MCP server
+- LLM-driven reasoning per agent for risk scoring, fraud heuristics, and pricing
+- x402 payment integration for every inter-agent and external-provider call
 
 ---
 
-### 6. Developer Security Tooling
+## Smart Contract Layer
 
-Developers building new protocols can integrate BuzzShield into their CI/CD pipelines or deployment scripts to automatically scan smart contract addresses before inclusion in a whitelist or before production deployment.
+ATLAS's on-chain layer, built on **Odra**, consists of four coordinated contract types:
 
-```
-Developer deploys new pool contract
-  → BuzzShield scans the deployment address
-  → SAFE verdict confirms no unintended backdoors detected
-  → Contract is added to the protocol's approved list
-```
-
-**Impact:** Adds a lightweight security gate to development workflows, catching issues before they reach end users.
-
----
-
-### 7. Human Users via the Dashboard
-
-The BuzzShield web dashboard allows non-technical users to manually submit any contract address for scanning. A retail investor unsure about a new project can get an instant risk score and verdict without needing to understand the underlying blockchain mechanics.
-
-**Impact:** Democratizes smart contract security — making institutional-quality risk assessment available to any user for 2 cents.
+| Contract | Purpose |
+|---|---|
+| **Receivable / Asset Tokenization Contract** | Deployed fresh per asset (not a shared pool), encoding face value, term, discount rate, and tranche structure. Keeps each asset's risk fully isolated and auditable on its own terms. |
+| **Compliance Credential Contract** | A non-transferable credential minted by the Compliance Agent, referenced by the tokenization contract at issuance. Designed for forward-compatibility with Casper's compliant security token roadmap. |
+| **Document Anchor Registry** | Stores only the SHA-256 fingerprint of the source document, a timestamp, and a reference to the asset it belongs to — the trust-minimization primitive behind ATLAS's verification model. |
+| **Oracle Update Log** | An append-only log the Oracle Agent writes to on each re-verification cycle, recording the trust-score delta and a reference to the evidence checked — giving every investor a fully auditable history of *why* an asset's trust score is what it is. |
 
 ---
 
 ## Project Structure
 
 ```
-buzzshield/
-│
-├── backend/                        # BuzzShield API Server
-│   ├── middleware/
-│   │   └── x402.js                 # x402 payment gatekeeper
-│   │                               # - Issues 402 challenges
-│   │                               # - Validates X-Payment headers
-│   │                               # - Calls Pieverse for settlement
-│   │
-│   ├── services/
-│   │   └── scanner.js              # Smart contract scanner engine
-│   │                               # - Risk scoring algorithm
-│   │                               # - Drainer registry checks
-│   │                               # - Vulnerability pattern analysis
-│   │
-│   ├── server.js                   # Express server + route definitions
-│   │                               # - GET  /health   (free)
-│   │                               # - POST /shield   ($0.02 — full scan)
-│   │                               # - GET  /score    ($0.01 — quick score)
-│   │
-│   └── .env                        # Merchant wallet + config (never commit)
-│
-├── frontend/                       # BuzzShield Dashboard (React + Vite)
-│   └── src/
-│       ├── App.jsx                 # Main dashboard component
-│       │                           # - Manual scan interface
-│       │                           # - 402 challenge visualization
-│       │                           # - Scan results display
-│       │                           # - Activity log
-│       └── App.css                 # Dark theme styles
-│
-└── agent/                          # Autonomous BuzzShield Agent
-    ├── mcpClient.js                # Kite Passport MCP interface
-    │                               # - get_payer_addr()
-    │                               # - approve_payment()
-    │
-    ├── x402Client.js               # x402 payment cycle handler
-    │                               # - fetchWithPayment()
-    │                               # - Handles 402 → pay → retry
-    │
-    ├── agent.js                    # Main agent program
-    │                               # - Loads contract list
-    │                               # - Runs autonomous scan loop
-    │                               # - Prints security report
-    │
-    └── .env                        # Agent ID + BuzzShield URL
+atlas/
+├── prototype/
+│   └── atlas-demo.html          # Interactive multi-page UI prototype (current submission)
+├── contracts/                    # Odra smart contracts (in progress)
+│   ├── receivable_tokenization/
+│   ├── compliance_credential/
+│   ├── document_anchor_registry/
+│   └── oracle_update_log/
+├── agents/                       # Agent service definitions (in progress)
+│   ├── scout/
+│   ├── underwriter/
+│   ├── compliance/
+│   ├── tokenization/
+│   ├── market_maker/
+│   └── oracle/
+├── docs/
+│   ├── architecture.md
+│   └── submission/               # Hackathon submission materials
+├── assets/
+│   └── logo/                     # ATLAS wordmark and icon (SVG)
+└── README.md
 ```
 
 ---
 
 ## Getting Started
 
-### Prerequisites
-
-- Node.js v18 or higher
-- A Kite Portal account — [https://x402-portal-eight.vercel.app](https://x402-portal-eight.vercel.app)
-- Testnet USDC.e from the faucet — [https://faucet.gokite.ai](https://faucet.gokite.ai)
-
-### 1. Clone the Repository
+The current submission includes a fully interactive front-end prototype demonstrating the complete ATLAS user experience and agent workflow.
 
 ```bash
-git clone https://github.com/yourusername/buzzshield.git
-cd buzzshield
+# Clone the repository
+git clone https://github.com/<your-org>/atlas.git
+cd atlas/prototype
+
+# Open directly in a browser
+open atlas-demo.html          # macOS
+# or simply double-click atlas-demo.html
+
+# Or serve it locally
+python3 -m http.server 8000
+# then visit http://localhost:8000/atlas-demo.html
 ```
 
-### 2. Set Up the Backend
-
-```bash
-cd backend
-npm install
-```
-
-Create your `.env` file:
-
-```env
-PORT=8099
-MERCHANT_WALLET=0xYourKiteWalletAddressHere
-FACILITATOR_URL=https://facilitator.pieverse.io
-USDC_CONTRACT=0x0fF5393387ad2f9f691FD6Fd28e07E3969e27e63
-KITE_CHAIN_ID=2368
-MERCHANT_NAME=BuzzShield
-```
-
-Start the backend:
-
-```bash
-npm run dev
-```
-
-Verify it's running:
-
-```bash
-curl http://localhost:8099/health
-```
-
-Expected response:
-```json
-{ "status": "BuzzShield is live", "chain": "kite-testnet", "chainId": 2368 }
-```
-
-### 3. Test the 402 Challenge
-
-```bash
-curl -X POST http://localhost:8099/shield \
-  -H "Content-Type: application/json" \
-  -d '{"contractAddress": "0x1234567890abcdef1234567890abcdef12345678"}'
-```
-
-You should receive an HTTP 402 response containing the payment bill. This confirms your gatekeeper is working correctly.
-
-### 4. Set Up the Frontend
-
-```bash
-cd ../frontend
-npm install
-npm run dev
-```
-
-Open [http://localhost:5173](http://localhost:5173) in your browser.
-
-### 5. Set Up the Agent
-
-```bash
-cd ../agent
-npm install
-```
-
-Create `agent/.env`:
-
-```env
-BUZZSHIELD_URL=http://localhost:8099
-KITE_MCP_URL=https://neo.dev.gokite.ai/v1/mcp?agentId=YOUR_AGENT_ID
-AGENT_ID=YOUR_AGENT_ID_FROM_KITE_PORTAL
-```
-
-Run the agent:
-
-```bash
-node agent.js
-```
-
-The agent will autonomously scan all contracts in its list, pay BuzzShield for each scan using Kite Passport, and print a full security report.
+No build step, dependencies, or backend are required to explore the prototype — it runs entirely client-side.
 
 ---
 
-## API Reference
+## Implementation Status
 
-### `GET /health`
-Free endpoint. Returns service status.
+We believe in being direct with judges about exactly what is live versus in progress, rather than letting a polished interface speak for more than it should.
 
-**Response:**
-```json
-{
-  "status": "BuzzShield is live",
-  "chain": "kite-testnet",
-  "chainId": 2368
-}
-```
+**What is fully built and interactive in this submission:**
+- The complete nine-page user experience described above, including the document upload and fingerprinting flow, the full agent swarm visualization with a live x402 ledger, the two-sided originator/investor dashboards, the Agent Network directory, Analytics, and drill-down Portfolio history.
 
----
+**What is currently simulated, and being actively built next:**
+- Live agent reasoning (currently represented via realistic, fully-specified simulated agent output rather than live LLM calls)
+- Real x402-metered calls to external data, credit, and KYC providers
+- Autonomous Odra contract generation and deployment by the Tokenization Agent (contract architecture is designed; live deployment is in progress)
 
-### `POST /shield`
-**Price:** $0.02 USDC.e  
-Full smart contract security scan. Returns detailed verdict, risk score, and identified vulnerability flags.
-
-**Request Body:**
-```json
-{
-  "contractAddress": "0x1234567890abcdef1234567890abcdef12345678"
-}
-```
-
-**Response (200 OK after payment):**
-```json
-{
-  "contractAddress": "0x1234567890abcdef1234567890abcdef12345678",
-  "verdict": "SAFE",
-  "riskScore": 95,
-  "flags": [],
-  "scannedAt": "2026-04-17T10:00:00.000Z",
-  "paymentReceipt": {
-    "txHash": "0xabc123...",
-    "settled": true
-  }
-}
-```
-
-**Without payment (402):**
-```json
-{
-  "error": "X-PAYMENT header is required",
-  "accepts": [{
-    "scheme": "gokite-aa",
-    "network": "kite-testnet",
-    "maxAmountRequired": "20000000000000000",
-    "payTo": "0xYourMerchantWallet",
-    "asset": "0x0fF5393387ad2f9f691FD6Fd28e07E3969e27e63",
-    "merchantName": "BuzzShield"
-  }],
-  "x402Version": 1
-}
-```
-
----
-
-### `GET /score`
-**Price:** $0.01 USDC.e  
-Quick risk score. Returns a simplified grade without full flag analysis.
-
-**Query Parameters:** `address=0x...`
-
-**Response (200 OK after payment):**
-```json
-{
-  "contractAddress": "0x1234...",
-  "score": 88,
-  "grade": "A",
-  "summary": "SAFE"
-}
-```
-
----
-
-## The Agent in Action
-
-When you run `node agent.js`, you will see output like this:
-
-```
-══════════════════════════════════════════════════════
-   🤖 BUZZSHIELD SECURITY AGENT — STARTING UP
-══════════════════════════════════════════════════════
-  BuzzShield API: http://localhost:8099
-  Contracts to scan: 3
-  Estimated cost: ~$0.06 USDC.e
-  Payment method: Kite Passport (autonomous)
-══════════════════════════════════════════════════════
-
-  ✅ BuzzShield is online: BuzzShield is live
-
-  🚀 Starting autonomous scan sequence...
-
-🔎 Scanning: Unknown DeFi Protocol
-   Address: 0x1234567890abcdef...
-   Reason: User wants to invest — checking safety first
-──────────────────────────────────────────────────────
-  📡 Calling: http://localhost:8099/shield
-  ⚡ 402 Payment Required received
-  💸 Amount: $0.0200 USDC.e
-  🏦 Pay to: 0xEfD0497f4557b49E84369cfb884B6c7446e11aBA
-  🌐 Network: kite-testnet
-  🔍 Fetching payer wallet address from Kite Passport...
-  👤 Payer address: 0x742d35Cc...
-  ✍️  Requesting payment authorization for 20000000000000000 USDC...
-  🔐 Payment authorized by Kite Passport
-  🔄 Retrying request with X-Payment header...
-  ✅ Payment settled & results received!
-
-══════════════════════════════════════════════════════
-        🛡️  BUZZSHIELD SECURITY REPORT
-══════════════════════════════════════════════════════
-  Agent completed: 3 scans
-  Total spent:     $0.06 USDC.e
-  Network:         Kite Testnet (Chain ID: 2368)
-══════════════════════════════════════════════════════
-
-  1. ✅ Unknown DeFi Protocol
-     Verdict:    SAFE
-     Risk Score: 95/100
-     Paid:       $0.02
-     Receipt:    ✓ On-chain settlement confirmed
-
-  2. 🚨 Suspicious Airdrop Contract
-     Verdict:    MALICIOUS
-     Risk Score: 10/100
-     Flags:
-       • [CRITICAL] Known drainer contract
-     Paid:       $0.02
-     Receipt:    ✓ On-chain settlement confirmed
-
-  3. ⚠️  New NFT Marketplace
-     Verdict:    SUSPICIOUS
-     Risk Score: 61/100
-     Paid:       $0.02
-     Receipt:    ✓ On-chain settlement confirmed
-
-══════════════════════════════════════════════════════
-
-  📋 AGENT DECISIONS:
-  ✅ Unknown DeFi Protocol → PROCEED with interaction
-  🚨 Suspicious Airdrop Contract → ABORT — do not interact
-  ⚠️  New NFT Marketplace → CAUTION — manual review needed
-
-══════════════════════════════════════════════════════
-
-  💡 All payments made autonomously via Kite Passport
-  🔗 Transactions recorded on Kite Testnet blockchain
-  🤖 Zero human intervention required
-══════════════════════════════════════════════════════
-```
-
----
-
-## Technology Stack
-
-| Layer | Technology | Role |
-|-------|------------|------|
-| **Blockchain** | Kite L1 (Chain ID: 2368) | Settlement layer for all payments |
-| **Payment Protocol** | x402 (gokite-aa scheme) | HTTP-native payment handshake |
-| **Identity & Wallet** | Kite Passport + MCP | Agent authentication and payment signing |
-| **Payment Facilitator** | Pieverse | On-chain transaction execution and verification |
-| **Payment Token** | USDC.e | Stablecoin used for all transactions |
-| **API Framework** | Express.js (Node.js) | BuzzShield backend server |
-| **Frontend** | React + Vite | Human-facing dashboard |
-| **Agent Runtime** | Node.js | Autonomous scanning agent |
-
----
-
-## Why This Matters
-
-BuzzShield is a proof of concept for something much larger than smart contract scanning.
-
-**It demonstrates that the agentic economy is real.** The Kite AI ecosystem provides everything needed for an AI agent to be a first-class economic participant — owning identity, holding a budget, making payments, and receiving services — without any human involvement at transaction time.
-
-**It demonstrates that pay-per-use is the right model for AI.** Traditional API billing assumes a human managing subscriptions and API keys. But AI agents are transient, numerous, and need to pay for exactly what they use. The x402 model — negotiating and settling payment within the HTTP request itself — is the only model that scales to billions of agent-to-service interactions.
-
-**It demonstrates that security is the foundation.** Every AI agent that operates in a DeFi environment needs to be able to trust the contracts it interacts with. BuzzShield provides that trust layer — cheaply, instantly, and without any friction for the agent consuming it.
-
-The scanner is the product. The payment infrastructure is the innovation. Together, they show what the next generation of the internet looks like when machines can buy services the same way humans do — but at machine speed, machine scale, and with machine precision.
+A minimal real transaction demonstrating the Odra deployment path is included in this repository to satisfy the qualification round's on-chain requirement, with full agent-to-chain integration as our immediate next milestone.
 
 ---
 
 ## Roadmap
 
-- [ ] **Slither Integration** — Replace heuristic scanning with Slither static analysis for real vulnerability detection
-- [ ] **On-chain Registry** — Store known drainer/malicious addresses in a Kite L1 smart contract for community-maintained updates
-- [ ] **Streaming Payments** — Switch from per-request to streaming micropayments for long-running analysis jobs
-- [ ] **Agent SDK** — Publish an npm package (`buzzshield-agent`) so any developer can add security scanning to their agent in 3 lines of code
-- [ ] **Batch Scanning** — Single payment covers scanning up to 10 contracts in one request
-- [ ] **Mainnet Deployment** — Production deployment on Kite mainnet with real USDC
+**Phase 1 — Post-Hackathon Hardening (Months 0–3)**
+Connect each agent to real external data providers metered by genuine x402 calls; commission an external security review of the Odra contract suite; onboard 3–5 pilot originators with real, small-value invoices to stress-test the full pipeline end-to-end on testnet.
+
+**Phase 2 — Trust and Model Maturity (Months 3–9)**
+Fine-tune the Underwriter and Oracle agents against real underwriting outcomes; add a second, independent attestation layer (counterparty confirmation) for stronger fraud resistance; formalize compliance partnerships and align the Compliance Credential Contract with Casper's native compliant security token primitives as they ship; expand supported asset classes to solar leases, rent rolls, and carbon credit forwards at pilot scale.
+
+**Phase 3 — Scale and Cross-Chain Expansion (Months 9–18)**
+Move to Casper mainnet as x402 and MCP infrastructure matures for production use; open a secondary market for tranche tokens via CSPR.trade; begin institutional investor onboarding; explore cross-chain liquidity bridges and integrate Casper smart accounts once generally available.
 
 ---
 
-## Network Information
+## Track Alignment
 
-| Parameter | Value |
-|-----------|-------|
-| Chain Name | KiteAI Testnet |
-| Chain ID | 2368 |
-| RPC URL | https://rpc-testnet.gokite.ai/ |
-| Explorer | https://testnet.kitescan.ai/ |
-| Faucet | https://faucet.gokite.ai |
-| USDC.e Contract | 0x0fF5393387ad2f9f691FD6Fd28e07E3969e27e63 |
-| Facilitator | https://facilitator.pieverse.io |
+ATLAS was built for the Casper Innovation Track's core convergence point — Agentic AI, DeFi, and Real-World Assets — using every component of Casper's AI Toolkit: x402 for agent-to-agent payment, MCP servers for discovery and chain access, CSPR.trade MCP for autonomous liquidity, CSPR.cloud as the middleware layer, and Odra with `llms.txt` for autonomous contract generation. It combines and extends the buildathon's own suggested build directions — the RWA Oracle Agent pattern and the AI-Driven Compliance pattern — into a single, full-lifecycle system rather than a standalone example of either.
 
 ---
 
-## License
+## License & Acknowledgments
 
-MIT © 2026 BuzzShield
+Built for the **Casper Agentic Buildathon 2026**, organized by the **Casper Association** in partnership with **DoraHacks** and **Istanbul Blockchain Week**.
+
+Licensed under the MIT License — see `LICENSE` for details.
 
 ---
 
-*Built for the Kite AI Hackathon — April 2026*  
-*Powered by Kite AI · x402 Protocol · Pieverse*
+*ATLAS — Real-world assets. Underwritten by machines. Settled on Casper.*
