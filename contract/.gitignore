@@ -1,1 +1,5 @@
 node_modules
+
+# Casper key material — NEVER commit private keys
+casper_keys/
+*.pem

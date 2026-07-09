@@ -1,9 +1,30 @@
 # ATLAS
 ### Autonomous RWA Underwriting Mesh — built on Casper
 
-**ATLAS turns a real-world debt into investable capital in minutes — sourced, underwritten, tokenized, and settled entirely by autonomous AI agents that pay each other to do it, on Casper.**
+> **A six-agent AI swarm that turns a real-world debt into investable capital in minutes — sourced, underwritten, tokenized, and settled autonomously, with every handoff settled by x402 micropayments on Casper.**
+
+[![CI](https://github.com/Nailer/ATLAS/actions/workflows/ci.yml/badge.svg)](https://github.com/Nailer/ATLAS/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/Nailer/ATLAS/actions/workflows/codeql.yml/badge.svg)](https://github.com/Nailer/ATLAS/actions/workflows/codeql.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Casper Network](https://img.shields.io/badge/Casper-Testnet-orange)](https://testnet.cspr.live/deploy/9b3ecf721f759fd6fa0a90b581ed6ffe9d35ba034670d0845116af978213d7e5)
+[![Casper Agentic Buildathon 2026](https://img.shields.io/badge/Buildathon-2026-purple)](https://dorahacks.io)
+[![Odra](https://img.shields.io/badge/Odra-v2.8.2-green)](https://odra.dev)
+
+**Topics:** `casper-blockchain` · `casper-network` · `buildathon` · `rwa` · `defi` · `ai-agents` · `mcp` · `x402` · `odra` · `smart-contracts` · `real-world-assets` · `autonomous-agents`
 
 *Casper Agentic Buildathon 2026 — Qualification Round Submission*
+
+---
+
+## 📋 Community
+
+| | |
+|---|---|
+| 🐛 **Bug Reports** | [Open an issue](.github/ISSUE_TEMPLATE/bug_report.md) |
+| 💡 **Feature Requests** | [Open an issue](.github/ISSUE_TEMPLATE/feature_request.md) |
+| 🤝 **Contributing** | [CONTRIBUTING.md](CONTRIBUTING.md) |
+| 🔒 **Security Policy** | [SECURITY.md](SECURITY.md) |
+| 📜 **Code of Conduct** | [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) |
 
 ---
 
@@ -22,7 +43,6 @@ The ATLAS asset-registry smart contract has been successfully compiled to WebAss
 
 ---
 
-
 ## Table of Contents
 
 1. [The Problem](#the-problem)
@@ -37,7 +57,8 @@ The ATLAS asset-registry smart contract has been successfully compiled to WebAss
 10. [Implementation Status](#implementation-status)
 11. [Roadmap](#roadmap)
 12. [Track Alignment](#track-alignment)
-13. [License & Acknowledgments](#license--acknowledgments)
+13. [Security](#security)
+14. [License & Acknowledgments](#license--acknowledgments)
 
 ---
 
@@ -470,6 +491,51 @@ Move to Casper mainnet as x402 and MCP infrastructure matures for production use
 ## Track Alignment
 
 ATLAS was built for the Casper Innovation Track's core convergence point — Agentic AI, DeFi, and Real-World Assets — using every component of Casper's AI Toolkit: x402 for agent-to-agent payment, MCP servers for discovery and chain access, CSPR.trade MCP for autonomous liquidity, CSPR.cloud as the middleware layer, and Odra with `llms.txt` for autonomous contract generation. It combines and extends the buildathon's own suggested build directions — the RWA Oracle Agent pattern and the AI-Driven Compliance pattern — into a single, full-lifecycle system rather than a standalone example of either.
+
+---
+
+## Security
+
+ATLAS uses a layered security approach across all components:
+
+| Tool | Purpose |
+|---|---|
+| **GitHub CodeQL** | Static analysis on every push and PR — detects vulnerabilities in JS/TS and Rust source |
+| **Dependabot** | Automated weekly PRs for dependency updates across npm (frontend/backend/contract) and Cargo |
+| **`npm audit --audit-level=high`** | Run in CI on every push; blocks the build on High/Critical findings |
+| **`cargo audit`** | Rust dependency advisory check, run on every push |
+| **Dependency Review Action** | Blocks PRs that introduce packages with High+ severity known vulnerabilities |
+
+To report a vulnerability, see [SECURITY.md](SECURITY.md). **Do not open a public GitHub issue for security findings.**
+
+---
+
+## GitHub Repository Setup
+
+> The following checklist documents the repository's compliance with the hackathon's GitHub community standards requirement.
+
+### Repository Settings
+- ✅ **Visibility**: Public
+- ✅ **Description**: "Autonomous RWA Underwriting Mesh — six AI agents that underwrite, tokenize, and settle real-world assets on Casper using x402 and MCP"
+- ✅ **Website**: [testnet.cspr.live/deploy/9b3ecf721f759fd6fa0a90b581ed6ffe9d35ba034670d0845116af978213d7e5](https://testnet.cspr.live/deploy/9b3ecf721f759fd6fa0a90b581ed6ffe9d35ba034670d0845116af978213d7e5)
+- ✅ **Topics**: `casper-blockchain`, `casper-network`, `buildathon`, `rwa`, `defi`, `ai-agents`, `mcp`, `x402`, `odra`, `smart-contracts`, `real-world-assets`, `autonomous-agents`
+
+### Community Standards
+- ✅ [README.md](README.md) — Comprehensive project documentation
+- ✅ [CONTRIBUTING.md](CONTRIBUTING.md) — Contribution guidelines
+- ✅ [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) — Contributor Covenant v2.1
+- ✅ [SECURITY.md](SECURITY.md) — Security policy and responsible disclosure
+- ✅ [.github/ISSUE_TEMPLATE/bug_report.md](.github/ISSUE_TEMPLATE/bug_report.md) — Bug report template
+- ✅ [.github/ISSUE_TEMPLATE/feature_request.md](.github/ISSUE_TEMPLATE/feature_request.md) — Feature request template
+- ✅ [.github/pull_request_template.md](.github/pull_request_template.md) — PR template
+- ✅ `LICENSE` — MIT License
+
+### CI / Security Tools
+- ✅ [CodeQL Analysis](.github/workflows/codeql.yml) — enabled via GitHub Actions
+- ✅ [Dependabot](.github/dependabot.yml) — enabled for npm (×3) + Cargo + GitHub Actions
+- ✅ [CI with `npm audit --audit-level=high`](.github/workflows/ci.yml) — blocks on High/Critical
+- ✅ Dependency Review Action — blocks PRs introducing High+ severity packages
+- ✅ Private vulnerability reporting — via GitHub's Security tab
 
 ---
 

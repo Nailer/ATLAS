@@ -1,0 +1,69 @@
+version: 2
+updates:
+  # Frontend (Vite + React)
+  - package-ecosystem: "npm"
+    directory: "/frontend"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    labels:
+      - "dependencies"
+      - "frontend"
+    open-pull-requests-limit: 10
+    groups:
+      react-ecosystem:
+        patterns:
+          - "react*"
+          - "@types/react*"
+      vite-ecosystem:
+        patterns:
+          - "vite*"
+          - "@vitejs/*"
+      eslint-ecosystem:
+        patterns:
+          - "eslint*"
+          - "@eslint/*"
+
+  # Backend (Node.js / Express)
+  - package-ecosystem: "npm"
+    directory: "/backend"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    labels:
+      - "dependencies"
+      - "backend"
+    open-pull-requests-limit: 10
+
+  # Contract deployment scripts
+  - package-ecosystem: "npm"
+    directory: "/contract"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    labels:
+      - "dependencies"
+      - "smart-contracts"
+    open-pull-requests-limit: 5
+
+  # Rust / Cargo (Odra smart contracts)
+  - package-ecosystem: "cargo"
+    directory: "/atlas_registry"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    labels:
+      - "dependencies"
+      - "smart-contracts"
+    open-pull-requests-limit: 5
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    labels:
+      - "dependencies"
+      - "ci"
+    open-pull-requests-limit: 5
