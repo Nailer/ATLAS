@@ -7,15 +7,21 @@
 
 ---
 
-Sending deploy...
+## 🚀 Live on Casper Testnet
 
-✅ Deploy sent!
-Deploy hash: 4270cc4e7ddfe0dce88719f17698bb6c8fa0328865ffad286970b1f869ed9c9d
+The ATLAS asset-registry smart contract has been successfully compiled to WebAssembly and deployed to the **Casper testnet**.
 
-Check its status here:
-https://testnet.cspr.live/deploy/4270cc4e7ddfe0dce88719f17698bb6c8fa0328865ffad286970b1f869ed9c9d
+| | |
+|---|---|
+| **Network** | Casper Testnet (`casper-test`) |
+| **Contract** | ATLAS Asset Registry (`Flipper`) |
+| **Deploy Hash** | [`9b3ecf721f759fd6fa0a90b581ed6ffe9d35ba034670d0845116af978213d7e5`](https://testnet.cspr.live/deploy/9b3ecf721f759fd6fa0a90b581ed6ffe9d35ba034670d0845116af978213d7e5) |
+| **Explorer** | [View on testnet.cspr.live ↗](https://testnet.cspr.live/deploy/9b3ecf721f759fd6fa0a90b581ed6ffe9d35ba034670d0845116af978213d7e5) |
+| **Compiled with** | `cargo odra build` → optimized WASM via `binaryen` + `wabt` |
+| **Toolchain** | Odra v2.8.2 · Rust `wasm32-unknown-unknown` · Casper contract SDK |
 
 ---
+
 
 ## Table of Contents
 
