@@ -1,5 +1,5 @@
 const fs = require("fs");
-const { CasperClient, Contracts, Keys, RuntimeArgs } = require("casper-js-sdk");
+const { CasperClient, CLValueBuilder, Contracts, Keys, RuntimeArgs } = require("casper-js-sdk");
 
 // ---- EDIT THESE THREE LINES ----
 const WASM_PATH = "../atlas_registry/flipper/wasm/Flipper.wasm"; // optimized output of `cargo odra build`
@@ -18,10 +18,16 @@ async function main() {
 
   const wasm = new Uint8Array(fs.readFileSync(WASM_PATH).buffer);
 
+
+
+  const installArgs = RuntimeArgs.fromMap({
+    odra_cfg_is_upgradable: CLValueBuilder.bool(false),
+  });
+
   const deploy = contract.install(
     wasm,
-    RuntimeArgs.fromMap({}),
-    "50000000000", // 50 CSPR gas payment — Odra contracts can be gas-hungry, this gives headroom
+    installArgs,
+    "200000000000", // 200 CSPR — Odra init + storage allocation needs more headroom
     keys.publicKey,
     CHAIN_NAME,
     [keys]
