@@ -1,0 +1,14 @@
+[package]
+edition = "2021"
+name = "casper-cli"
+version = "0.1.0"
+
+[dependencies]
+flapper = { path = "../flapper" }
+flipper = { path = "../flipper" }
+odra = { workspace = true }
+odra-cli = { workspace = true }
+
+[[bin]]
+name = "atlas_registry_cli"
+path = "cli.rs"
