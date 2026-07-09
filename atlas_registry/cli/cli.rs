@@ -37,10 +37,10 @@ impl DeployScript for ContractsDeployScript {
     }
 }
 
-/// Scenario that flips the state of both `Flipper` and `Flapper` contracts.
-pub struct FlipThemAll;
+/// Scenario that registers an asset via `Flipper` and flaps via `Flapper`.
+pub struct RegisterAsset;
 
-impl Scenario for FlipThemAll {
+impl Scenario for RegisterAsset {
     fn args(&self) -> Vec<CommandArg> {
         vec![]
     }
@@ -55,16 +55,16 @@ impl Scenario for FlipThemAll {
         let mut flapper = container.contract_ref::<Flapper>(env)?;
 
         env.set_gas(50_000_000);
-        flipper.try_flip()?;
+        flipper.try_register_asset()?;
         flapper.try_flap()?;
 
         Ok(())
     }
 }
 
-impl ScenarioMetadata for FlipThemAll {
-    const NAME: &'static str = "flip_them_all";
-    const DESCRIPTION: &'static str = "Flips the state of the Flipper and Flapper contracts.";
+impl ScenarioMetadata for RegisterAsset {
+    const NAME: &'static str = "register_asset";
+    const DESCRIPTION: &'static str = "Registers an asset via the Flipper contract and flaps via Flapper.";
 }
 
 /// Main function to run the CLI tool.
@@ -74,7 +74,7 @@ pub fn main() {
         .deploy(ContractsDeployScript)
         .contract::<Flipper>()
         .contract::<Flapper>()
-        .scenario(FlipThemAll)
+        .scenario(RegisterAsset)
         .build()
         .run();
 }

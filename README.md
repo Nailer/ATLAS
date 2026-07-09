@@ -7,6 +7,16 @@
 
 ---
 
+Sending deploy...
+
+✅ Deploy sent!
+Deploy hash: 4270cc4e7ddfe0dce88719f17698bb6c8fa0328865ffad286970b1f869ed9c9d
+
+Check its status here:
+https://testnet.cspr.live/deploy/4270cc4e7ddfe0dce88719f17698bb6c8fa0328865ffad286970b1f869ed9c9d
+
+---
+
 ## Table of Contents
 
 1. [The Problem](#the-problem)
