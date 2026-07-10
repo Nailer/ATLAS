@@ -18,7 +18,7 @@
 **No local setup required.**
 
 1. Open the deploy on Casper testnet explorer:  
-   **[testnet.cspr.live/deploy/9b3ecf721f759fd6fa0a90b581ed6ffe9d35ba034670d0845116af978213d7e5](https://testnet.cspr.live/deploy/9b3ecf721f759fd6fa0a90b581ed6ffe9d35ba034670d0845116af978213d7e5)**
+   **[testnet.cspr.live/deploy/3d66af45bf5d93abc9411ed576dc19978cc92b6759c3aceb97cc0541e2171d64](https://testnet.cspr.live/deploy/3d66af45bf5d93abc9411ed576dc19978cc92b6759c3aceb97cc0541e2171d64)**
 
 2. Confirm:
    - Status: **Success**

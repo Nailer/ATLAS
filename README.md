@@ -6,7 +6,7 @@
 [![CI](https://github.com/Nailer/ATLAS/actions/workflows/ci.yml/badge.svg)](https://github.com/Nailer/ATLAS/actions/workflows/ci.yml)
 [![CodeQL](https://github.com/Nailer/ATLAS/actions/workflows/codeql.yml/badge.svg)](https://github.com/Nailer/ATLAS/actions/workflows/codeql.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Casper Network](https://img.shields.io/badge/Casper-Testnet-orange)](https://testnet.cspr.live/deploy/9b3ecf721f759fd6fa0a90b581ed6ffe9d35ba034670d0845116af978213d7e5)
+[![Casper Network](https://img.shields.io/badge/Casper-Testnet-orange)](https://testnet.cspr.live/deploy/3d66af45bf5d93abc9411ed576dc19978cc92b6759c3aceb97cc0541e2171d64)
 [![Casper Agentic Buildathon 2026](https://img.shields.io/badge/Buildathon-2026-purple)](https://dorahacks.io)
 [![Odra](https://img.shields.io/badge/Odra-v2.8.2-green)](https://odra.dev)
 
@@ -36,8 +36,8 @@ The ATLAS asset-registry smart contract has been successfully compiled to WebAss
 |---|---|
 | **Network** | Casper Testnet (`casper-test`) |
 | **Contract** | ATLAS Asset Registry (`Flipper`) |
-| **Deploy Hash** | [`9b3ecf721f759fd6fa0a90b581ed6ffe9d35ba034670d0845116af978213d7e5`](https://testnet.cspr.live/deploy/9b3ecf721f759fd6fa0a90b581ed6ffe9d35ba034670d0845116af978213d7e5) |
-| **Explorer** | [View on testnet.cspr.live ↗](https://testnet.cspr.live/deploy/9b3ecf721f759fd6fa0a90b581ed6ffe9d35ba034670d0845116af978213d7e5) |
+| **Deploy Hash** | [`3d66af45bf5d93abc9411ed576dc19978cc92b6759c3aceb97cc0541e2171d64`](https://testnet.cspr.live/deploy/3d66af45bf5d93abc9411ed576dc19978cc92b6759c3aceb97cc0541e2171d64) |
+| **Explorer** | [View on testnet.cspr.live ↗](https://testnet.cspr.live/deploy/3d66af45bf5d93abc9411ed576dc19978cc92b6759c3aceb97cc0541e2171d64) |
 | **Compiled with** | `cargo odra build` → optimized WASM via `binaryen` + `wabt` |
 | **Toolchain** | Odra v2.8.2 · Rust `wasm32-unknown-unknown` · Casper contract SDK |
 
@@ -517,7 +517,7 @@ To report a vulnerability, see [SECURITY.md](SECURITY.md). **Do not open a publi
 ### Repository Settings
 - ✅ **Visibility**: Public
 - ✅ **Description**: "Autonomous RWA Underwriting Mesh — six AI agents that underwrite, tokenize, and settle real-world assets on Casper using x402 and MCP"
-- ✅ **Website**: [testnet.cspr.live/deploy/9b3ecf721f759fd6fa0a90b581ed6ffe9d35ba034670d0845116af978213d7e5](https://testnet.cspr.live/deploy/9b3ecf721f759fd6fa0a90b581ed6ffe9d35ba034670d0845116af978213d7e5)
+- ✅ **Website**: [testnet.cspr.live/deploy/3d66af45bf5d93abc9411ed576dc19978cc92b6759c3aceb97cc0541e2171d64](https://testnet.cspr.live/deploy/3d66af45bf5d93abc9411ed576dc19978cc92b6759c3aceb97cc0541e2171d64)
 - ✅ **Topics**: `casper-blockchain`, `casper-network`, `buildathon`, `rwa`, `defi`, `ai-agents`, `mcp`, `x402`, `odra`, `smart-contracts`, `real-world-assets`, `autonomous-agents`
 
 ### Community Standards

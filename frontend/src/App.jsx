@@ -17,7 +17,7 @@ const COLORS = {
   textDim: "#3A4A6B",
 };
 
-const DEPLOY_HASH = "9b3ecf721f759fd6fa0a90b581ed6ffe9d35ba034670d0845116af978213d7e5";
+const DEPLOY_HASH = "3d66af45bf5d93abc9411ed576dc19978cc92b6759c3aceb97cc0541e2171d64";
 const CSPR_CLOUD_URL = `https://api.testnet.cspr.cloud/deploys/${DEPLOY_HASH}`;
 const EXPLORER_URL = `https://testnet.cspr.live/deploy/${DEPLOY_HASH}`;
 const ACCOUNT_EXPLORER = `https://testnet.cspr.live/account/`;

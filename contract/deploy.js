@@ -21,13 +21,16 @@ async function main() {
 
 
   const installArgs = RuntimeArgs.fromMap({
-    odra_cfg_is_upgradable: CLValueBuilder.bool(false),
+    odra_cfg_is_upgradable:           CLValueBuilder.bool(false),
+    odra_cfg_is_upgrade:              CLValueBuilder.bool(false),
+    odra_cfg_package_hash_key_name:   CLValueBuilder.string("atlas_asset_registry"),
+    odra_cfg_allow_key_override:      CLValueBuilder.bool(false),
   });
 
   const deploy = contract.install(
     wasm,
     installArgs,
-    "200000000000", // 200 CSPR — Odra init + storage allocation needs more headroom
+    "500000000000", // 500 CSPR — Odra 240KB WASM needs more gas than a simple contract
     keys.publicKey,
     CHAIN_NAME,
     [keys]

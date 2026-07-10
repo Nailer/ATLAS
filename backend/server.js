@@ -19,7 +19,7 @@ app.get("/health", (req, res) => {
     status: "ATLAS Agent Mesh is live",
     chain: "casper-test",
     network: "Casper Testnet",
-    deployHash: "9b3ecf721f759fd6fa0a90b581ed6ffe9d35ba034670d0845116af978213d7e5",
+    deployHash: "3d66af45bf5d93abc9411ed576dc19978cc92b6759c3aceb97cc0541e2171d64",
     agents: ["Scout", "Underwriter", "Compliance", "Tokenization", "Market-Maker", "Oracle"],
   });
 });
