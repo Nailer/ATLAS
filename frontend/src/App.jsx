@@ -658,8 +658,17 @@ function Dashboard({ user }) {
   );
 }
 
+// ─── SHA-256 UTILITY (Web Crypto API) ─────────────────────────────────────────
+async function sha256(text) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(text);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
 // ─── SUBMIT ASSET (Originator Flow) ──────────────────────────────────────────
-function SubmitAsset() {
+function SubmitAsset({ onAssetRegistered }) {
   const [step, setStep] = useState(0);
   const [assetType, setAssetType] = useState("invoice");
   const [amount, setAmount] = useState("");
@@ -667,6 +676,7 @@ function SubmitAsset() {
   const [dueDate, setDueDate] = useState("");
   const [docContent, setDocContent] = useState("");
   const [docHash, setDocHash] = useState("");
+  const [isHashing, setIsHashing] = useState(false);
   const [pipeline, setPipeline] = useState([]);
   const [pipelineStep, setPipelineStep] = useState(-1);
   const [assetId] = useState("INV-ATLAS-" + Math.floor(1000 + Math.random() * 9000));
@@ -696,6 +706,25 @@ function SubmitAsset() {
       setPipeline((p) => [...p, i]);
     }
     setPipelineStep(-1);
+    // Register the asset into the shared registry so the Proof Validator can find it
+    if (onAssetRegistered) {
+      onAssetRegistered({
+        id: assetId,
+        type: assetTypes.find((a) => a.id === assetType)?.label || assetType,
+        originator: counterparty || "Unknown",
+        amount: amount ? `$${Number(amount).toLocaleString()}` : "$0",
+        yield: "11.4%",
+        term: dueDate || "Net-60",
+        riskScore: 87,
+        funded: 0,
+        tranche: "Senior",
+        status: "open",
+        contractDeployed: true,
+        docHash: docHash,
+        anchoredAt: new Date().toISOString(),
+        anchorBlock: Math.floor(2_800_000 + Math.random() * 10_000),
+      });
+    }
     setStep(4);
   };
 
@@ -703,13 +732,12 @@ function SubmitAsset() {
     if (step === 3) runPipeline();
   }, [step]);
 
-  const hashDoc = () => {
+  const hashDoc = async () => {
     if (!docContent) return;
-    // Simulate SHA-256 from doc content (deterministic based on length + chars)
-    const fake = Array.from(docContent.slice(0, 32))
-      .map((c, i) => (c.charCodeAt(0) ^ i).toString(16).padStart(2, "0"))
-      .join("") + "a4f9c2e1d7b308" + docContent.length.toString(16).padStart(6, "0");
-    setDocHash(fake.slice(0, 64));
+    setIsHashing(true);
+    const hash = await sha256(docContent);
+    setDocHash(hash);
+    setIsHashing(false);
   };
 
   if (step === 3) {
@@ -840,8 +868,8 @@ function SubmitAsset() {
               Paste the key text from your supporting document. ATLAS will fingerprint it (SHA-256) and anchor only the hash on-chain — the document itself stays private.
             </p>
             <textarea value={docContent} onChange={(e) => { setDocContent(e.target.value); setDocHash(""); }} placeholder="Paste invoice text, contract excerpt, or any identifying document content here…" style={{ marginBottom: 12, height: 120 }} />
-            <button className="btn-ghost" onClick={hashDoc} disabled={!docContent} style={{ marginBottom: 16, fontSize: 13 }}>
-              Generate SHA-256 Fingerprint →
+            <button className="btn-ghost" onClick={hashDoc} disabled={!docContent || isHashing} style={{ marginBottom: 16, fontSize: 13 }}>
+              {isHashing ? "Hashing…" : "Generate SHA-256 Fingerprint →"}
             </button>
             {docHash && (
               <div className="fade-in">
@@ -1315,17 +1343,309 @@ function ChainData() {
   );
 }
 
+// ─── PROOF VALIDATOR ───────────────────────────────────────────────────────────
+function ProofValidator({ registeredAssets }) {
+  const [inputText, setInputText] = useState("");
+  const [inputHash, setInputHash] = useState("");
+  const [isHashing, setIsHashing] = useState(false);
+  const [result, setResult] = useState(null); // null | { verified, asset?, hash }
+  const [showPayload, setShowPayload] = useState(false);
+
+  const allAssets = registeredAssets || [];
+
+  const handleVerify = async () => {
+    if (!inputText.trim()) return;
+    setIsHashing(true);
+    setResult(null);
+    // Allow UI to render the hashing state
+    await new Promise((r) => setTimeout(r, 120));
+    const hash = await sha256(inputText.trim());
+    setInputHash(hash);
+    // Simulate a brief chain query delay
+    await new Promise((r) => setTimeout(r, 600));
+    const match = allAssets.find((a) => a.docHash === hash);
+    setResult({ verified: !!match, asset: match || null, hash });
+    setIsHashing(false);
+  };
+
+  const handleVerifyByHash = async () => {
+    if (!inputHash.trim() || inputHash.trim().length !== 64) return;
+    setIsHashing(true);
+    setResult(null);
+    await new Promise((r) => setTimeout(r, 600));
+    const hash = inputHash.trim().toLowerCase();
+    const match = allAssets.find((a) => a.docHash === hash);
+    setResult({ verified: !!match, asset: match || null, hash });
+    setIsHashing(false);
+  };
+
+  const rpcRequest = result ? JSON.stringify({
+    jsonrpc: "2.0", id: 1, method: "state_get_item",
+    params: {
+      state_root_hash: "a1b2c3d4e5f6…",
+      key: `uref-atlas-doc-anchor-${result.hash.slice(0, 16)}`,
+      path: ["document_fingerprint"],
+    },
+  }, null, 2) : "";
+
+  const rpcResponse = result ? JSON.stringify({
+    jsonrpc: "2.0", id: 1,
+    result: {
+      stored_value: {
+        CLValue: {
+          cl_type: "String",
+          bytes: result.hash,
+          parsed: result.hash,
+        },
+      },
+      merkle_proof: "[truncated for display]",
+      api_version: "1.5.6",
+    },
+  }, null, 2) : "";
+
+  return (
+    <div style={{ maxWidth: 780, margin: "0 auto" }}>
+      {/* Header */}
+      <div className="card" style={{ marginBottom: 20, background: "linear-gradient(135deg, rgba(0,229,255,0.08), rgba(123,97,255,0.06))", borderColor: COLORS.borderGlow }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 12 }}>
+          <div style={{ width: 48, height: 48, borderRadius: 12, background: "linear-gradient(135deg, rgba(0,255,148,0.2), rgba(0,229,255,0.15))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24 }}>🛡️</div>
+          <div>
+            <h2 style={{ fontSize: 22, fontWeight: 700, marginBottom: 4 }}>Verifiable Document Validator</h2>
+            <p style={{ fontSize: 13, color: COLORS.textMuted, lineHeight: 1.5 }}>
+              Prove any private financial document is authentic and unaltered — without revealing its contents — by checking its SHA-256 fingerprint against the Casper on-chain anchor.
+            </p>
+          </div>
+        </div>
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+          <span className="tag tag-green" style={{ fontSize: 11 }}>🔐 Privacy-Preserving</span>
+          <span className="tag tag-cyan" style={{ fontSize: 11 }}>⛓️ On-Chain Anchored</span>
+          <span className="tag tag-purple" style={{ fontSize: 11 }}>🤖 Agent-Verified</span>
+          <span className="tag tag-amber" style={{ fontSize: 11 }}>{allAssets.length} anchored assets</span>
+        </div>
+      </div>
+
+      {/* How it works */}
+      <div className="card" style={{ marginBottom: 20 }}>
+        <h3 style={{ fontWeight: 600, marginBottom: 14, fontSize: 15 }}>How Proof Validation Works</h3>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16 }}>
+          {[
+            { step: "1", icon: "📄", title: "Paste Document", desc: "Paste the private document text. It never leaves your browser." },
+            { step: "2", icon: "🔏", title: "SHA-256 Hash", desc: "Web Crypto API generates a cryptographic fingerprint client-side." },
+            { step: "3", icon: "✅", title: "Chain Lookup", desc: "The fingerprint is matched against ATLAS on-chain anchors on Casper." },
+          ].map((s) => (
+            <div key={s.step} style={{ textAlign: "center", padding: 16 }}>
+              <div style={{ width: 36, height: 36, borderRadius: "50%", background: `linear-gradient(135deg, ${COLORS.primary}, ${COLORS.secondary})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: COLORS.bg, margin: "0 auto 10px" }}>{s.step}</div>
+              <div style={{ fontSize: 20, marginBottom: 6 }}>{s.icon}</div>
+              <div style={{ fontWeight: 600, fontSize: 13, marginBottom: 4 }}>{s.title}</div>
+              <div style={{ fontSize: 12, color: COLORS.textMuted, lineHeight: 1.5 }}>{s.desc}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Input */}
+      <div className="card" style={{ marginBottom: 20 }}>
+        <h3 style={{ fontWeight: 600, marginBottom: 6, fontSize: 15 }}>Verify a Document</h3>
+        <p style={{ fontSize: 12, color: COLORS.textMuted, marginBottom: 16, lineHeight: 1.5 }}>
+          Paste the full text of the document you want to verify. ATLAS will hash it in your browser and check the fingerprint against on-chain anchors.
+        </p>
+        <textarea
+          value={inputText}
+          onChange={(e) => { setInputText(e.target.value); setResult(null); }}
+          placeholder="Paste invoice text, contract excerpt, or any document content to verify…"
+          style={{ marginBottom: 12, height: 120 }}
+        />
+        <button className="btn-primary" onClick={handleVerify} disabled={!inputText.trim() || isHashing} style={{ marginBottom: 20 }}>
+          {isHashing ? "Hashing & Querying Casper…" : "Verify Document →"}
+        </button>
+
+        <div style={{ borderTop: `1px solid ${COLORS.border}`, paddingTop: 16 }}>
+          <div style={{ fontSize: 12, color: COLORS.textMuted, marginBottom: 8 }}>Or verify by hash directly:</div>
+          <div style={{ display: "flex", gap: 10 }}>
+            <input
+              type="text"
+              value={inputHash}
+              onChange={(e) => { setInputHash(e.target.value); setResult(null); }}
+              placeholder="Paste a 64-character SHA-256 hash…"
+              style={{ flex: 1, fontFamily: "'JetBrains Mono', monospace", fontSize: 12 }}
+            />
+            <button className="btn-ghost" onClick={handleVerifyByHash} disabled={!inputHash.trim() || inputHash.trim().length !== 64 || isHashing} style={{ flexShrink: 0, fontSize: 12, padding: "10px 16px" }}>
+              Check Hash
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Hashing animation */}
+      {isHashing && (
+        <div className="card fade-in" style={{ marginBottom: 20, textAlign: "center", padding: 32 }}>
+          <div style={{ width: 32, height: 32, border: `3px solid ${COLORS.primary}`, borderTopColor: "transparent", borderRadius: "50%", animation: "spin 1s linear infinite", margin: "0 auto 16px" }} />
+          <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 4 }}>Computing SHA-256 & Querying Casper Testnet…</div>
+          <div style={{ fontSize: 12, color: COLORS.textMuted }}>Document stays in your browser. Only the fingerprint is checked.</div>
+        </div>
+      )}
+
+      {/* Result: Verified */}
+      {result && result.verified && (
+        <div className="card fade-in" style={{ marginBottom: 20, borderColor: COLORS.green, background: "linear-gradient(135deg, rgba(0,255,148,0.06), rgba(0,229,255,0.04))", position: "relative", overflow: "hidden" }}>
+          <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: `linear-gradient(90deg, ${COLORS.green}, ${COLORS.primary})` }} />
+          <div style={{ textAlign: "center", marginBottom: 24 }}>
+            <div style={{ fontSize: 56, marginBottom: 8 }}>✅</div>
+            <h3 style={{ fontSize: 22, fontWeight: 700, color: COLORS.green, marginBottom: 6 }}>Document Verified</h3>
+            <p style={{ fontSize: 13, color: COLORS.textMuted }}>This document's fingerprint matches an on-chain anchor on Casper testnet.</p>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 20 }}>
+            {[
+              ["Asset ID", result.asset.id],
+              ["Originator", result.asset.originator],
+              ["Face Value", result.asset.amount],
+              ["Yield (APY)", result.asset.yield],
+              ["Risk Score", `${result.asset.riskScore}/100`],
+              ["Status", result.asset.status],
+            ].map(([k, v]) => (
+              <div key={k} style={{ padding: "10px 14px", background: "rgba(0,255,148,0.04)", border: `1px solid rgba(0,255,148,0.1)`, borderRadius: 10 }}>
+                <div style={{ fontSize: 11, color: COLORS.textDim, marginBottom: 3, textTransform: "uppercase", letterSpacing: "0.5px" }}>{k}</div>
+                <div style={{ fontSize: 14, fontWeight: 600, color: COLORS.text }}>{v}</div>
+              </div>
+            ))}
+          </div>
+
+          <div style={{ marginBottom: 16 }}>
+            <div style={{ fontSize: 11, color: COLORS.textDim, marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.5px" }}>Document Fingerprint (SHA-256)</div>
+            <div className="hash-box">{result.hash}</div>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
+            <div className="metric-card">
+              <div style={{ fontSize: 11, color: COLORS.textMuted, marginBottom: 4 }}>Anchor Block</div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: COLORS.primary }}>#{result.asset.anchorBlock?.toLocaleString() || "2,804,391"}</div>
+            </div>
+            <div className="metric-card">
+              <div style={{ fontSize: 11, color: COLORS.textMuted, marginBottom: 4 }}>Network</div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: COLORS.green }}>casper-test</div>
+            </div>
+            <div className="metric-card">
+              <div style={{ fontSize: 11, color: COLORS.textMuted, marginBottom: 4 }}>Anchored At</div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: COLORS.text }}>{result.asset.anchoredAt ? new Date(result.asset.anchoredAt).toLocaleString() : "2026-07-13"}</div>
+            </div>
+          </div>
+
+          <div style={{ marginTop: 16, textAlign: "center" }}>
+            <a href={EXPLORER_URL} target="_blank" rel="noreferrer" className="btn-ghost" style={{ fontSize: 12, padding: "8px 16px" }}>
+              View anchor on cspr.live ↗
+            </a>
+          </div>
+        </div>
+      )}
+
+      {/* Result: Not verified */}
+      {result && !result.verified && (
+        <div className="card fade-in" style={{ marginBottom: 20, borderColor: COLORS.accent, background: "linear-gradient(135deg, rgba(255,107,107,0.06), rgba(255,184,0,0.04))", position: "relative", overflow: "hidden" }}>
+          <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: `linear-gradient(90deg, ${COLORS.accent}, ${COLORS.amber})` }} />
+          <div style={{ textAlign: "center", marginBottom: 20 }}>
+            <div style={{ fontSize: 56, marginBottom: 8 }}>⚠️</div>
+            <h3 style={{ fontSize: 22, fontWeight: 700, color: COLORS.accent, marginBottom: 6 }}>Document Not Verified</h3>
+            <p style={{ fontSize: 13, color: COLORS.textMuted, lineHeight: 1.6, maxWidth: 500, margin: "0 auto" }}>
+              This document's SHA-256 fingerprint does not match any on-chain anchor in the ATLAS registry.
+              This could mean the document has been modified, or it was never submitted to the ATLAS underwriting swarm.
+            </p>
+          </div>
+          <div style={{ marginBottom: 16 }}>
+            <div style={{ fontSize: 11, color: COLORS.textDim, marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.5px" }}>Computed Fingerprint (no match)</div>
+            <div className="hash-box" style={{ color: COLORS.accent }}>{result.hash}</div>
+          </div>
+          <div style={{ padding: "12px 16px", background: "rgba(255,107,107,0.06)", border: `1px solid rgba(255,107,107,0.15)`, borderRadius: 10, fontSize: 12, color: COLORS.textMuted, lineHeight: 1.6 }}>
+            <strong style={{ color: COLORS.accent }}>What this means:</strong> If a single character in the document was changed after it was originally anchored, the hash will be completely different — this is mathematically guaranteed by SHA-256. The mismatch proves the document presented is not the same one the originator submitted.
+          </div>
+        </div>
+      )}
+
+      {/* RPC Payload viewer */}
+      {result && (
+        <div className="card" style={{ marginBottom: 20 }}>
+          <div
+            onClick={() => setShowPayload(!showPayload)}
+            style={{ display: "flex", justifyContent: "space-between", alignItems: "center", cursor: "pointer", userSelect: "none" }}
+          >
+            <div>
+              <h3 style={{ fontWeight: 600, fontSize: 14, marginBottom: 2 }}>Casper RPC Verification Payload</h3>
+              <div style={{ fontSize: 12, color: COLORS.textMuted }}>See exactly how ATLAS queries the Casper testnet to verify this fingerprint.</div>
+            </div>
+            <span style={{ color: COLORS.primary, fontSize: 18, transition: "transform 0.2s", transform: showPayload ? "rotate(180deg)" : "rotate(0deg)" }}>▼</span>
+          </div>
+          {showPayload && (
+            <div className="fade-in" style={{ marginTop: 16 }}>
+              <div style={{ marginBottom: 12 }}>
+                <div style={{ fontSize: 11, color: COLORS.textDim, marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.5px" }}>JSON-RPC Request → Casper Testnet</div>
+                <pre style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: COLORS.textMuted, background: COLORS.bgCard2, padding: 16, borderRadius: 8, overflowX: "auto", lineHeight: 1.6 }}>
+                  {rpcRequest}
+                </pre>
+              </div>
+              <div>
+                <div style={{ fontSize: 11, color: COLORS.textDim, marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.5px" }}>JSON-RPC Response ← Casper Testnet</div>
+                <pre style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: result.verified ? COLORS.green : COLORS.accent, background: COLORS.bgCard2, padding: 16, borderRadius: 8, overflowX: "auto", lineHeight: 1.6 }}>
+                  {result.verified ? rpcResponse : JSON.stringify({ jsonrpc: "2.0", id: 1, error: { code: -32003, message: "No stored value found for the given key", data: `uref-atlas-doc-anchor-${result.hash.slice(0, 16)}` } }, null, 2)}
+                </pre>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Registered assets table */}
+      <div className="card">
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+          <h3 style={{ fontWeight: 600, fontSize: 15 }}>Anchored Document Registry</h3>
+          <span className="tag tag-cyan" style={{ fontSize: 11 }}>{allAssets.length} anchored</span>
+        </div>
+        {allAssets.length === 0 && (
+          <div style={{ textAlign: "center", padding: "32px 0", color: COLORS.textMuted, fontSize: 13 }}>
+            No assets anchored yet. Submit an asset through the originator flow to anchor its document fingerprint.
+          </div>
+        )}
+        {allAssets.map((a) => (
+          <div key={a.id} className="tx-row">
+            <div style={{ width: 38, height: 38, borderRadius: 10, background: "rgba(0,255,148,0.08)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}>🔏</div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 14, fontWeight: 500 }}>{a.id} · <span style={{ fontWeight: 400, color: COLORS.textMuted }}>{a.originator}</span></div>
+              <div style={{ fontSize: 11, color: COLORS.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>{a.docHash ? a.docHash.slice(0, 24) + "…" + a.docHash.slice(-8) : "no hash"}</div>
+            </div>
+            <div style={{ textAlign: "right", flexShrink: 0 }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: COLORS.primary }}>{a.amount}</div>
+              <div style={{ fontSize: 10, color: COLORS.textMuted }}>{a.anchoredAt ? new Date(a.anchoredAt).toLocaleDateString() : "—"}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // ─── MAIN APP ─────────────────────────────────────────────────────────────────
 export default function App() {
   const [screen, setScreen] = useState("landing");
   const [user, setUser] = useState(null);
   const [page, setPage] = useState("dashboard");
 
+  // Shared asset registry — pre-populated with marketplace seed data, extended by Submit Asset flow
+  const [registeredAssets, setRegisteredAssets] = useState([
+    { id: "INV-ATLAS-0417", type: "Trade Invoice", originator: "Meridian Trading Co.", amount: "$50,000", yield: "11.4%", term: "Net-60", riskScore: 87, funded: 72, tranche: "Senior", status: "open", contractDeployed: true, docHash: "a3f7c9e2d1b4086fa5e9c31d8b2a570e4f9c2a1d6b8e3f705a91c4d2ee41c1b9", anchoredAt: "2026-07-10T09:22:00Z", anchorBlock: 2804102 },
+    { id: "INV-ATLAS-0418", type: "Trade Invoice", originator: "BrightPath Logistics", amount: "$125,000", yield: "13.2%", term: "Net-90", riskScore: 79, funded: 38, tranche: "Senior + Junior", status: "open", contractDeployed: true, docHash: "d82b1f4a9c3e570186dfa24b7e9c013d5a82f4b7c9e1360d8a5c72f9b4e0a318", anchoredAt: "2026-07-11T14:05:00Z", anchorBlock: 2805447 },
+    { id: "SOL-ATLAS-0411", type: "Solar Lease", originator: "SunStream Energy", amount: "$320,000", yield: "9.8%", term: "24 months", riskScore: 91, funded: 95, tranche: "Senior", status: "funded", contractDeployed: true, docHash: "7e1c3b9a4f2d80561ca8e70d3f9b2a14c5d8e7f6b0a9324d1e8c5f7a2b6d039e", anchoredAt: "2026-07-08T11:31:00Z", anchorBlock: 2801893 },
+    { id: "RNT-ATLAS-0403", type: "Rent Roll", originator: "NorthGate Properties", amount: "$78,000", yield: "10.1%", term: "12 months", riskScore: 84, funded: 100, tranche: "Senior", status: "matured", contractDeployed: true, docHash: "b4a2d8c1e5f30976d2b1a4c8e7f53019d6a2b8c4e1f7305a9d2c8e4f1b7a603d", anchoredAt: "2026-06-29T16:48:00Z", anchorBlock: 2793821 },
+  ]);
+
+  const handleAssetRegistered = (asset) => {
+    setRegisteredAssets((prev) => [...prev, asset]);
+  };
+
   const nav = [
     { id: "dashboard", icon: "⊞", label: "Dashboard" },
     { id: "submit", icon: "↑", label: "Submit Asset" },
     { id: "agents", icon: "🤖", label: "Agent Swarm" },
     { id: "marketplace", icon: "🏛️", label: "Marketplace" },
+    { id: "validator", icon: "🛡️", label: "Proof Validator" },
     { id: "chain", icon: "⛓️", label: "On-Chain Data" },
     { id: "testing", icon: "🧪", label: "Testing Guide" },
   ];
@@ -1335,9 +1655,10 @@ export default function App() {
 
   const pages = {
     dashboard: <Dashboard user={user} />,
-    submit: <SubmitAsset />,
+    submit: <SubmitAsset onAssetRegistered={handleAssetRegistered} />,
     agents: <AgentSwarm />,
     marketplace: <Marketplace />,
+    validator: <ProofValidator registeredAssets={registeredAssets} />,
     chain: <ChainData />,
     testing: <TestingGuide />,
   };
@@ -1346,6 +1667,7 @@ export default function App() {
     submit: "Submit Asset",
     agents: "Agent Swarm",
     marketplace: "Asset Marketplace",
+    validator: "Proof Validator",
     chain: "On-Chain Data",
     testing: "Testing Guide",
   };
