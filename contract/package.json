@@ -11,6 +11,6 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "casper-js-sdk": "^2.15.7"
+    "casper-js-sdk": "^5.1.0"
   }
 }
